@@ -17,14 +17,14 @@ body {
 body.dark {
 
     .site-layout {
-        --tr-hover-color: #1d2234;
-        --border-line-color: #1d2234;
-        --rows-color: #1d2234;
+        --tr-hover-color: var(--blue-dark-color);
+        --border-line-color: var(--blue-dark-color);
+        --rows-color: var(--blue-dark-color);
         --hover-v1-color: #FFC107;
         --first-text-color: #B9BAC0;
         --white-input: #131722;
         --progress-color: #c19a23;
-        --select-option: #1d2234;
+        --select-option: var(--blue-dark-color);
 
         color: var(--dark-text-color);
         background-color: var(--dark-body-color);
