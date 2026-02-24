@@ -1,0 +1,38 @@
+
+@import "./_login_register/login_register";
+@import "./form-button";
+@import "./form-field";
+@import "./form-group";
+@import "./form-search";
+
+
+.form-container {
+
+    max-width: 700px;
+    width: 100%;
+    margin: 6rem auto;
+    padding: 2rem;
+
+    border: 1px solid var(--border-line-color);
+    border-radius: 4px;
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+textarea:-webkit-autofill,
+textarea:-webkit-autofill:hover,
+textarea:-webkit-autofill:focus,
+select:-webkit-autofill,
+select:-webkit-autofill:hover,
+select:-webkit-autofill:focus {
+    -webkit-box-shadow: 0 0 0px 1000px var(--white-input) inset;
+    -webkit-text-fill-color: var(--first-text-color);
+}
+
+input:-internal-autofill-selected {
+    appearance: menulist-button;
+    background-color: var(--white-input) !important;
+    background-image: none !important;
+    color: var(--first-text-color) !important;
+}

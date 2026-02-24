@@ -1,0 +1,47 @@
+<div class="site-layout">
+    <!-- BASE START -->
+    <div class="base-container">
+
+        <!-- base container Left start -->
+        <div class="base-container__left">
+            <div class="theme-mode-login mb-10 absolute top-10">
+                <!-- mode start -->
+                <theme-mode v-if="$page.props.theme_mode_enabled"></theme-mode>
+                <!-- mode end -->
+            </div>
+            <div class="base-container__left-content">
+                <div class="base-container__left-logo">
+                    <Link :href="route('home')">
+                        <img class="main-logo" v-if="logo" :src="logo" />
+                        <img class="main-logo" v-else :src="route('home') + '/images/logo.png'" />
+                    </Link>
+                </div>
+                <div class="base-container__left-title">
+                    <h1>{{ $t('The Most') }}
+                        <span class="typer typer-text" id="typer-main" :data-words="$t('Trusted') +','+ $t('Secure') +','+ $t('Fast') +','+ $t('Reliable')" data-delay="100" data-deleteDelay="1000"></span>
+                        <span class="cursor typer-cursor" data-owner="typer-main"></span>
+                        <br>{{ $t('Cryptocurrency Exchange.') }}
+                    </h1>
+                    <p>{{ $t('Get started with the easiest and most secure platform to buy, sell, trade, and earn cryptocurrencies.') }}</p>
+                </div>
+
+            </div>
+        </div>
+        <!-- base container Left end -->
+
+        <!-- base container right start -->
+        <div class="base-container__right">
+            <div class="base-container__right-content">
+
+                <!-- form components start -->
+                <slot></slot>
+                <!-- form components end -->
+
+            </div>
+        </div>
+        <!-- base container right end -->
+
+    </div>
+    <!-- BASE END -->
+
+</div>

@@ -1,0 +1,49 @@
+<app-layout>
+    <h1 class="mb-8 font-bold text-3xl">
+        <Link class="text-indigo-400 hover:text-indigo-600" :href="route('admin.pages')">Pages</Link>
+        - {{ subTitle }}
+    </h1>
+    <div class="bg-white rounded shadow overflow-hidden w-full">
+        <form @submit.prevent="submit">
+            <div class="p-8 -mr-6 -mb-8 flex flex-wrap">
+
+                <div class="pr-6 pb-8 w-full">
+                    <div class="font-weight-bold text-xl border-b mb-2 pb-4 font-medium">General Information</div>
+                </div>
+
+                <text-input v-model="form.title" :error="errors.title" class="pr-6 pb-8 w-full lg:w-1/2" label="Name" />
+
+                <text-input v-model="form.slug" :error="errors.slug" class="pr-6 pb-8 w-full lg:w-1/2" label="Slug" />
+
+                <div class="pr-6 pb-8 w-full">
+                    <label class="form-label block mr-2 mb-3">Activate Page</label>
+                    <t-toggle v-model="form.status" />
+                </div>
+
+                <div class="pr-6 pb-8 w-full">
+                    <quill-editor
+                        v-model="form.content"
+                        height="250"
+                    />
+                    <div v-if="errors.content" class="form-error text-red-500">{{ errors.content }}</div>
+                </div>
+                <div class="pr-6 pb-8 w-full">
+                    <div class="font-weight-bold text-xl border-b mt-5 mb-2 pb-4 font-medium">SEO Meta</div>
+
+                    <empty-column></empty-column>
+
+                    <text-input v-model="form.seo_title" :error="errors.seo_title" class="pr-6 pb-8 w-full lg:w-1/2" label="SEO Title" />
+
+                    <text-input v-model="form.seo_keywords" :error="errors.seo_keywords" class="pr-6 pb-8 w-full lg:w-1/2" label="SEO Keywords" />
+
+                    <text-input v-model="form.seo_description" :error="errors.seo_description" class="pr-6 pb-8 w-full lg:w-1/2" label="SEO Description" />
+
+                </div>
+            </div>
+            <div class="px-8 py-4 bg-gray-100 border-t border-gray-200 flex items-center">
+                <button v-if="isEdit" class="focus:outline-none text-red-600 hover:underline" tabindex="-1" type="button" @click="destroy">Delete Page</button>
+                <loading-button :loading="sending" class="btn-indigo ml-auto" type="submit">{{ actionButtonTitle }}</loading-button>
+            </div>
+        </form>
+    </div>
+</app-layout>

@@ -1,0 +1,44 @@
+<jet-form-section @submitted="updateProfileInformation">
+    <div class="form-container form-changeemail">
+        <!-- form components start -->
+        <div class="form-components">
+
+            <div class="form-components__title"><h3>{{ $t('Change Email') }}</h3></div>
+            <div class="form-components__body">
+                <div class="form-components__input-text">
+
+                    <div class="form-components__block">
+                        <div class="form-components__block-item block-text">
+                            <p>{{ $t('Fill the form to change your email address') }}</p>
+                        </div>
+                    </div>
+                    <div class="form-components__block">
+                        <div class="input-field" :class="{'invalid': form.errors.email}">
+                            <label for="input_email">{{ $t('Email') }}</label>
+                            <input autocomplete="new-password"  v-model="form.email" type="text" id="input_email">
+                            <span v-if="form.errors.email" class="helper-text">{{ form.errors.email }}</span>
+                        </div>
+                    </div>
+                    <div class="form-components__block">
+                        <div class="form-components__block-item block-button">
+                            <button :disabled="form.processing" :class="{ 'opacity-75': form.processing }" class="form-components__block-button">{{ $t('Save') }}</button>
+                        </div>
+                    </div>
+
+                    <div class="form-components__block">
+                        <div class="form-components__block-item block-text">
+                            <p>
+                                <jet-action-message :on="form.recentlySuccessful" class="mr-3">
+                                    {{ $t('Saved.') }}
+                                </jet-action-message>
+                            </p>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+        <!-- form components end -->
+    </div>
+</jet-form-section>

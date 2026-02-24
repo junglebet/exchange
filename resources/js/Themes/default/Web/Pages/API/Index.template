@@ -1,0 +1,28 @@
+<app-layout>
+
+<div class="components-title"><h2>{{ $t('Api Tokens') }}</h2></div>
+
+<!-- tab component nav start -->
+<div class="tabs-components tabs">
+
+    <!-- tabs left start -->
+    <div class="tabs-left">
+        <div class="tabs-nav">
+            <div @click="setPage('email')" class="tabs-nav__item"><h4>{{ $t('Email Change') }}</h4></div>
+            <div @click="setPage('password')" class="tabs-nav__item"><h4>{{ $t('Password Change') }}</h4></div>
+            <div @click="setPage('2fa')" class="tabs-nav__item"><h4>{{ $t('Two Factor Authentication') }}</h4></div>
+            <div @click="setPage('browser_sessions')" class="tabs-nav__item"><h4>{{ $t('Browser Sessions') }}</h4></div>
+            <div class="tabs-nav__item tabs-nav__active"><h4>{{ $t('Api Tokens') }}</h4></div>
+            <div @click="setPage('account_delete')" class="tabs-nav__item"><h4>{{ $t('Delete Account') }}</h4></div>
+        </div>
+    </div>
+    <!-- tabs left end -->
+
+</div>
+<!-- tab component nav end -->
+
+<api-token-manager :tokens="tokens"
+                   :available-permissions="availablePermissions"
+                   :default-permissions="defaultPermissions" />
+
+</app-layout>

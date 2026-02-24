@@ -1,0 +1,378 @@
+<app-layout>
+
+<!-- components title start -->
+<div class="components-title">
+    <h2>{{ $t('Deposit') }} {{ currency.symbol }}</h2>
+</div>
+
+<!-- form search start -->
+<div class="form-search">
+    <div v-if="!currency.deposit_status" class="mb-20">
+        <div class="form-search__info">
+            <div class="form-search__info-icon">
+                <svg-icon icon="info"></svg-icon>
+            </div>
+            <div class="block-info__content">
+                <h4>{{ currency.symbol }} {{ $t('Deposits Suspended') }}</h4>
+                <p>{{ $t('We have disabled deposits as our systems are currently undergoing maintenance.') }}</p>
+            </div>
+        </div>
+    </div>
+    <div v-else class="form-search__container w-full full-block-fields">
+        <div class="form-search__result xl:w-1/2 md:w-1/2 w-full p-4">
+            <div class="form-search__result-block components-filter__item">
+                <div class="form-search__result-title">{{ $t('Asset') }}</div>
+                <t-rich-user-select
+                    v-model="activeAsset.symbol"
+                    :options="currencies"
+                    v-on:change="changeAsset"
+                    :placeholder="$t('Select coi1n')"
+                    value-attribute="symbol"
+                    text-attribute="fullname"
+                    :clearable="false"
+                >
+                    <template
+                        slot="label"
+                        slot-scope="{ className, option, query }"
+                    >
+                        <div class="flex">
+                            <div class="flex flex-col">
+                                <div class="swap-label flex items-stretch">
+                                    <img :src="option.raw.logo" width="28" />
+                                    <span class="pt-1 ml-5">{{ option.raw.fullname }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </template>
+                    <template
+                        slot="option"
+                        slot-scope="{ className, option, query }"
+                    >
+                        <div class="flex">
+                            <div class="flex flex-col">
+                                <div class="flex items-stretch pt-2 pb-2 pl-2">
+                                    <img :src="option.raw.logo" width="28" />
+                                    <span class="pt-1 ml-5">{{ option.raw.fullname }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </template>
+                </t-rich-user-select>
+            </div>
+
+            <div v-if="activeAsset" class="form-search__result-block components-filter__item components-filter__item-v2">
+                <div class="form-search__result-title">{{ $t('Network') }}</div>
+                <t-rich-user-select
+                    v-model="activeNetwork"
+                    :options="networks"
+                    v-on:change="loadAddress"
+                    :placeholder="$t('Select network')"
+                    :clearable="false"
+                    :hideSearchBox="true"
+                >
+                    <template
+                        slot="label"
+                        slot-scope="{ className, option, query }"
+                    >
+                        <div class="flex">
+                            <div class="flex flex-col">
+                                <div class="swap-label flex items-stretch">
+                                    <span class="pt-1">{{ option.text }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </template>
+                    <template
+                        slot="option"
+                        slot-scope="{ className, option, query }"
+                    >
+                        <div class="flex">
+                            <div class="flex flex-col">
+                                <div class="flex items-stretch pt-2 pb-2 pl-2">
+                                    <span class="pt-1">{{ option.text }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </template>
+                </t-rich-user-select>
+            </div>
+            <div v-if="activeAsset && activeNetwork" class="form-search__result-block">
+
+                <div v-if="walletData" class="form-search__result-link qr-container mb-5">
+                    <template>
+                        <qr-code :size="180" :text="walletData.address"></qr-code>
+                    </template>
+                </div>
+
+                <div class="form-search__result-title">{{ $t('Address') }}</div>
+                <div class="form-search__result-link">
+                    <template v-if="walletData">
+                        {{ walletData.address }}
+                        <span @click="doCopy(walletData.address)" class="form-search__result-icon">
+                            <svg-icon icon="copy" classname="form-search__result-color"></svg-icon>
+                        </span>
+                    </template>
+                    <template v-else>
+                        {{ $t('Loading...') }}
+                    </template>
+                </div>
+            </div>
+            <div v-if="activeAsset && walletData && walletData.paymentId" class="form-search__result-block">
+                <div class="form-search__result-title">{{ $t('Payment ID') }}</div>
+                <div class="form-search__result-link">
+                    <template>
+                        {{ walletData.paymentId }}
+                        <span @click="doCopy(walletData.paymentId)" class="form-search__result-icon">
+                            <svg-icon icon="copy" classname="form-search__result-color"></svg-icon>
+                        </span>
+                        <PopperVue
+                            :arrow=true
+                            :show="showQrAlt"
+                            :options="tooltipOptions"
+                            popperClass="p-4 m-4 bg-white shadow rounded-sm transition-opacity"
+                        >
+                            <span @click="(showQrAlt = !showQrAlt, showQr = false)" class="form-search__result-icon mt-1">
+                                <svg-icon icon="qr" classname="form-search__result-color" extraclass="form-search__result-color2"></svg-icon>
+                            </span>
+                            <template #popper>
+                                <qr-code :size="120" :text="walletData.paymentId"></qr-code>
+                            </template>
+                        </PopperVue>
+                    </template>
+                </div>
+            </div>
+            <div v-if="activeNetwork" class="form-search__result-block result-block">
+                <div class="form-search__result-item">
+                    <span>{{ $t('Deposit Fee') }}</span>
+                    <template v-if="activeNetwork == 3">
+                        <p v-if="parseFloat(currency.deposit_fee_erc) > 0">{{ currency.deposit_fee_erc }}%</p>
+                        <p v-else>{{ currency.deposit_fee_erc_fixed }} {{ currency.symbol }}</p>
+                    </template>
+                    <template v-else-if="activeNetwork == 6">
+                        <p v-if="parseFloat(currency.deposit_fee_bep) > 0">{{ currency.deposit_fee_bep }}%</p>
+                        <p v-else>{{ currency.deposit_fee_bep_fixed }} {{ currency.symbol }}</p>
+                    </template>
+                    <template v-else-if="activeNetwork == 8">
+                        <p v-if="parseFloat(currency.deposit_fee_trc) > 0">{{ currency.deposit_fee_trc }}%</p>
+                        <p v-else>{{ currency.deposit_fee_trc_fixed }} {{ currency.symbol }}</p>
+                    </template>
+                    <template v-else-if="activeNetwork == 16">
+                        <p v-if="parseFloat(currency.deposit_fee_matic) > 0">{{ currency.deposit_fee_matic }}%</p>
+                        <p v-else>{{ currency.deposit_fee_matic_fixed }} {{ currency.symbol }}</p>
+                    </template>
+                    <template v-else>
+                        <p v-if="parseFloat(currency.deposit_fee) > 0">{{ currency.deposit_fee }}%</p>
+                        <p v-else>{{ currency.deposit_fee_fixed }} {{ currency.symbol }}</p>
+                    </template>
+                </div>
+                <div class="form-search__result-item">
+                    <span>{{ $t('Minimum deposit') }}</span>
+                    <p>{{ currency.min_deposit}} {{ currency.symbol }}</p>
+                </div>
+            </div>
+            <div class="form-search__result-block result-block"></div>
+            <div v-if="activeAsset" class="form-search__result-block">
+                <div class="form-search__result-title mb-3">{{ $t('Notes:') }}</div>
+                <ul>
+                    <li>{{ $t('Send only') }} <span class="color-sell">{{ activeAsset.symbol }}</span>
+                    {{ $t('to this deposit address') }}</li>
+                    <li v-if="activeAsset.has_payment_id"><span class="color-sell">
+                    {{ $t('Payment ID') }}</span>
+                    {{ $t('has to be provided for this currency, or you will lose your coins') }}
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- form search end -->
+
+<!-- table components start -->
+<div class="table-components">
+
+    <div class="tables-subtitle mb-10"><h4>{{ $t('Recent Deposits') }}</h4></div>
+
+    <!-- tables start -->
+    <table class="tables mb-10 mob-table-deposit-crypto">
+
+        <!-- tbody start -->
+        <tbody class="table-list cursor-pointer">
+            <tr v-if="deposits" v-for="deposit in deposits" @click="openModal(deposit)">
+                <td>
+                    <div class="table-list__value">
+                        <div class="table-list__image"><img :src="deposit.logo"/></div>
+                        <div class="table-list__title">{{ deposit.amount }} {{ deposit.symbol }}</div>
+                    </div>
+                </td>
+                <td>
+                    <div class="table-list__value">
+                        <div v-if="deposit.status == 'confirmed'" class="components-label label-green">
+                            {{ $t('Completed') }}
+                        </div>
+                        <div v-if="deposit.status == 'pending'" class="components-label label-orange">
+                            <svg class="animate-spin -ml-1 -mt-1 mr-1 h-4 w-4 text-orange inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            {{ $t('Pending') }}
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div class="table-list__value">
+                        <div class="table-list__text">
+                            <span class="list-text__name">{{ $t('Address:') }}</span>
+                            {{ format_string(deposit.address, 10) }}
+                            <span @click.stop="doCopy(deposit.address)" class="list-text__icon">
+                                <svg-icon icon="copy" classname="list-text__icon-color"></svg-icon>
+                            </span>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div class="table-list__value">
+                        <div class="table-list__text">
+                            <span class="list-text__name">{{ $t('Tx:') }}</span>
+                            {{ format_string(deposit.txn, 10) }}
+                            <a v-if="deposit.explorer" @click.stop="" target="_blank" :href="deposit.explorer" class="list-text__icon">
+                                <svg-icon icon="link" classname="list-text__icon-color"></svg-icon>
+                            </a>
+                            <span @click.stop="doCopy(deposit.txn)" class="list-text__icon">
+                                <svg-icon icon="copy" classname="list-text__icon-color"></svg-icon>
+                            </span>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div class="table-list__value">
+                        <div class="table-list__text">
+                            <span class="list-text__name">{{ $t('Date:') }}</span>
+                            {{ deposit.created_at }}
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div class="table-list__value">
+                        <div class="table-list__text">
+                            <span class="list-text__icon">
+                                <svg-icon icon="next" classname="list-text__icon-color"></svg-icon>
+                            </span>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+        <!-- tbody end -->
+
+        <!-- tfood start -->
+        <tfoot class="table-result">
+            <tr>
+                <td colspan="100">
+                    <div v-if="deposits.length == 0" class="table-result__notfound">
+                        <span class="table-result__notfound-icon">
+                            <svg-icon icon="not-found" classname="color-yellow"></svg-icon>
+                        </span>
+                        <span class="table-result__notfound-text">{{ $t('No deposits found.') }}</span>
+                    </div>
+                </td>
+            </tr>
+        </tfoot>
+        <!-- tfood end -->
+
+    </table>
+    <!-- tables end -->
+
+
+</div>
+<!-- table components end -->
+
+
+<!-- Show User  Modal -->
+<jet-dialog-modal :show="showDepositModal" @close="closeModal">
+    <template #title>
+        {{ $t('Deposit') }}
+    </template>
+
+    <template #content>
+        <div v-if="depositModal">
+            <div class="form-search">
+                <div class="form-search__container">
+                    <div class="form-search__result">
+                        <div class="form-search__result-block">
+                            <div class="form-search__result-item">
+                                <span>{{ $t('Status') }}</span>
+                                <p>
+                                    <div v-if="depositModal.status == 'confirmed'" class="components-label label-green mt-2">
+                                        {{ $t('Completed') }}
+                                    </div>
+                                    <div v-if="depositModal.status == 'pending'" class="components-label label-orange mt-2">
+                                        {{ $t('Pending') }}
+                                    </div>
+                                </p>
+                            </div>
+                        </div>
+                        <div class="form-search__result-block">
+                            <div class="form-search__result-item">
+                                <span>{{ $t('Coin') }}</span>
+                                <p>{{ depositModal.currency }}</p>
+                            </div>
+                        </div>
+                        <div class="form-search__result-block">
+                            <div class="form-search__result-item">
+                                <span>{{ $t('Symbol') }}</span>
+                                <p>{{ depositModal.symbol }}</p>
+                            </div>
+                        </div>
+                        <div class="form-search__result-block">
+                            <div class="form-search__result-title">{{ $t('Address') }}</div>
+                            <div class="form-search__result-link">
+                                {{ depositModal.address }}
+                                <span @click="doCopy(depositModal.address)" class="form-search__result-icon">
+                                    <svg-icon icon="copy" classname="form-search__result-color"></svg-icon>
+                                </span>
+                            </div>
+                        </div>
+                        <div v-if="depositModal.payment_id" class="form-search__result-block">
+                            <div class="form-search__result-title">{{ $t('Payment ID') }}</div>
+                            <div class="form-search__result-link">
+                                {{ depositModal.payment_id }}
+                                <span @click="doCopy(depositModal.payment_id)" class="form-search__result-icon">
+                                    <svg-icon icon="copy" classname="form-search__result-color"></svg-icon>
+                                </span>
+                            </div>
+                        </div>
+                        <div v-if="depositModal.txn" class="form-search__result-block">
+                            <div class="form-search__result-title">{{ $t('TXN') }}</div>
+                            <div class="form-search__result-link">
+                                {{ depositModal.txn}}
+                                <span @click="doCopy(depositModal.txn)" class="form-search__result-icon">
+                                    <svg-icon icon="copy" classname="form-search__result-color"></svg-icon>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="form-search__result-block result-block">
+                            <div class="form-search__result-item">
+                                <span>{{ $t('Deposit Fee') }}</span>
+                                <p>{{ depositModal.system_fee}} {{ currency.symbol }}</p>
+                            </div>
+                        </div>
+                        <div class="form-search__result-block result-block">
+                            <div class="form-search__result-item">
+                                <span>{{ $t('Date') }}</span>
+                                <p>{{ depositModal.created_at}}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <template #footer>
+        <jet-secondary-button @click.native="closeModal">
+            {{ $t('Close') }}
+        </jet-secondary-button>
+    </template>
+</jet-dialog-modal>
+
+</app-layout>

@@ -1,0 +1,100 @@
+<!-- MODULE ORDERBOOK START -->
+<div class="module module-orderbook">
+
+    <div class="module-container">
+        <div class="module-container__row">
+
+            <!-- module orderbook sell start -->
+            <div class="module-orderbook__sell module-container__block">
+
+                <!-- module orderbook title start -->
+                <div class="module-orderbook__title">
+                    <div class="module-orderbook__title-price">{{ $t('Price') }}</div>
+                    <div class="module-orderbook__title-amount">{{ $t('Amount') }}</div>
+                    <div class="module-orderbook__title-total flex justify-between">
+                        <div>
+                            {{ $t('Total') }}
+                        </div>
+                        <div>
+                            <nav class="flex justify-end pr-2 orderbook-mode-change">
+                                <button @click="setOrderbookMode('full')" class="w-5 focus:outline-none">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" class="css-3kwgah"><path d="M4 4h7v7H4V4z" fill="#ed6e72"></path><path d="M4 13h7v7H4v-7z" fill="#58ccb6"></path><path fill-rule="evenodd" clip-rule="evenodd" d="M13 4h7v4h-7V4zm0 6h7v4h-7v-4zm7 6h-7v4h7v-4z" fill="currentColor"></path></svg>
+                                </button>
+                                <button @click="setOrderbookMode('bids')" class="w-5 focus:outline-none">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" class="css-3kwgah"><path d="M4 4h7v16H4V4z" fill="#58ccb6"></path><path fill-rule="evenodd" clip-rule="evenodd" d="M13 4h7v4h-7V4zm0 6h7v4h-7v-4zm7 6h-7v4h7v-4z" fill="currentColor"></path></svg>
+                                </button>
+                                <button @click="setOrderbookMode('asks')" class="w-5 focus:outline-none">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" class="css-3kwgah"><path d="M4 4h7v16H4V4z" fill="#ed6e72"></path><path fill-rule="evenodd" clip-rule="evenodd" d="M13 4h7v4h-7V4zm0 6h7v4h-7v-4zm7 6h-7v4h7v-4z" fill="currentColor"></path></svg>
+                                </button>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+                <!-- module orderbook title  end -->
+
+                <div id="orderbookAsks" v-if="asks.length && (orderBookMode == 'full' || orderBookMode == 'asks')" class="module-orderbook__list" :class="{'full-height': orderBookMode == 'asks'}">
+                    <vue-scroll ref="sellScroll" :ops="scrollOps">
+                        <div v-for="ask in asks" @click="handleOrder(ask, 'sell')" class="module-orderbook__list-item relative">
+                            <span v-if="isMyOrderPrice(ask.price, 'sell')" class="module-orderbook__title-point"></span>
+                            <div class="module-orderbook__list-item__price">
+                                <span class="color-sell"><span v-if="isMyOrderPrice(ask.price, 'sell')" class="module-orderbook__color-point"></span> {{ decimal_format(ask.price, market.quote_precision, market.quote_currency_type) }}</span>
+                            </div>
+                            <div class="module-orderbook__list-item__amount">{{ decimal_format(ask.quantity, market.base_precision) }}</div>
+                            <div class="module-orderbook__list-item__total">{{ decimal_format(parseFloat(ask.quantity) * parseFloat(ask.price), market.base_precision) }}</div>
+                            <div class="module-orderbook__list-item__progressbar" :style="{'width' : calculateAmountBar(ask, 'sell')}"></div>
+                        </div>
+                    </vue-scroll>
+                </div>
+                <!-- module orderbook list  end -->
+                <!-- module orderbook empty  start -->
+                <div v-else-if="(orderBookMode == 'full' || orderBookMode == 'asks')" class="module-orderbook__empty">
+                    <p>{{ $t('No sell orders yet') }}</p>
+                </div>
+                <!-- module orderbook empty  end -->
+            </div>
+            <!-- module orderbook sell end -->
+
+
+                <!-- module orderbook title start -->
+
+                <!-- module orderbook buy start -->
+                <div class="module-orderbook__buy module-container__block">
+
+                    <div v-if="orderBookMode == 'full'" class="module-orderbook__title">
+                        <div class="module-orderbook__title-price mob-show">{{ $t('Price') }}</div>
+                        <div class="module-orderbook__title-amount mob-show">{{ $t('Amount') }}</div>
+
+                        <div class="module-orderbook__title-price mob-hide">
+                            <span :class="{'color-buy' : market_stats.change > 0, 'color-sell' : market_stats.change < 0}">{{ decimal_format(market_stats.last, market.quote_precision, market.quote_currency_type) }}</span>
+                        </div>
+                    </div>
+                    <!-- module orderbook title  end -->
+
+                    <!-- module orderbook list  start -->
+                    <!-- module orderbook list  start -->
+                    <div v-if="bids.length > 0 && (orderBookMode == 'full' || orderBookMode == 'bids')" class="module-orderbook__list" :class="{'full-height': orderBookMode == 'bids'}">
+                        <vue-scroll ref="buyScroll">
+                            <div v-for="bid in bids" @click="handleOrder(bid, 'buy')" class="module-orderbook__list-item relative">
+                                <span v-if="isMyOrderPrice(bid.price, 'buy')" class="module-orderbook__title-point"></span>
+                                <div class="module-orderbook__list-item__price">
+                                    <span class="color-buy"><span v-if="isMyOrderPrice(bid.price, 'buy')" class="module-orderbook__color-point"></span> {{ decimal_format(bid.price, market.quote_precision, market.quote_currency_type) }}</span>
+                                </div>
+                                <div class="module-orderbook__list-item__amount">{{ decimal_format(bid.quantity, market.base_precision) }}</div>
+                                <div class="module-orderbook__list-item__total">{{ decimal_format(parseFloat(bid.quantity) * parseFloat(bid.price), market.base_precision) }}</div>
+                                <div class="module-orderbook__list-item__progressbar" :style="{'width' : calculateAmountBar(bid, 'buy')}"></div>
+                            </div>
+                        </vue-scroll>
+                    </div>
+                    <!-- module orderbook list  end -->
+                    <!-- module orderbook empty buy start -->
+                    <div v-else-if="(orderBookMode == 'full' || orderBookMode == 'bids')" class="module-orderbook__empty-buy">
+                        <p>{{ $t('No buy orders yet') }}</p>
+                    </div>
+                    <!-- module orderbook empty buy end -->
+                </div>
+                <!-- module orderbook buy end -->
+        </div>
+    </div>
+
+</div>
+<!-- MODULE ORDERBOOK END -->

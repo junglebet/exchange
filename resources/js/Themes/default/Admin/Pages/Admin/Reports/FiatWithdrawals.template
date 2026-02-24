@@ -1,0 +1,202 @@
+<app-layout>
+    <admin-reports-tab :referrer="filters.referrer" section="fiat_withdrawals"></admin-reports-tab>
+    <h1 class="mt-10 mb-8 font-bold text-3xl">
+        <Link class="text-indigo-400 hover:text-indigo-600" :href="route('admin.users.edit', filters.referrer)" v-if="filters.referrer">Go Back - </Link> Fiat Withdrawals
+    </h1>
+    <div class="mb-6 flex justify-between items-center">
+        <search-filter v-model="form.search" class="w-full max-w-md mr-4 focus:outline-none" @reset="reset">
+
+        </search-filter>
+    </div>
+    <div class="bg-white rounded shadow overflow-x-auto">
+        <table class="w-full whitespace-no-wrap">
+            <tr class="text-left font-bold">
+                <th class="px-6 pt-6 pb-4">Status</th>
+                <th class="px-6 pt-6 pb-4">ID</th>
+                <th class="px-6 pt-6 pb-4">Amount</th>
+                <th class="px-6 pt-6 pb-4">Fee</th>
+                <th class="px-6 pt-6 pb-4">Amount + Fee</th>
+                <th class="px-6 pt-6 pb-4">User / Bank</th>
+                <th class="px-6 pt-6 pb-4">Actions</th>
+            </tr>
+            <tr v-for="withdrawal in withdrawals.data" :key="withdrawal.id" class="hover:bg-gray-100 focus-within:bg-gray-100">
+                <td class="border-t">
+                    <span class="px-6 py-4 flex items-center focus:text-indigo-500">
+                        <badge v-if="withdrawal.status == 'confirmed'" class="mr-2" type="green">
+                            {{ 'Confirmed' }}
+                            <t-dropdown
+                                variant="tooltip"
+                                toggle-on-hover
+                            >
+                              <span
+                                  slot="trigger"
+                                  class="text-white"
+                              >
+                                <font-awesome-icon icon="info-circle" class="ml-1" />
+                              </span>
+
+                              <template>
+                                  <div class="p-5 text-red-500" v-html="withdrawal.note"></div>
+                              </template>
+                            </t-dropdown>
+                        </badge>
+                        <badge v-if="withdrawal.status == 'pending'" class="mr-2" type="orange">
+                            {{ 'Pending' }}
+                        </badge>
+                        <badge v-if="withdrawal.status == 'rejected'" class="mr-2" type="red">
+                            {{ 'Rejected' }}
+                            <t-dropdown
+                                variant="tooltip"
+                                toggle-on-hover
+                            >
+                              <span
+                                  slot="trigger"
+                                  class="text-white"
+                              >
+                                <font-awesome-icon icon="info-circle" class="ml-1" />
+                              </span>
+
+                              <template>
+                                  <div class="p-5 text-red-500" v-html="withdrawal.rejected_reason"></div>
+                              </template>
+                            </t-dropdown>
+                        </badge>
+                    </span>
+                </td>
+                <td class="border-t">
+                    <span class="px-6 py-4 flex items-center">
+                        {{ withdrawal.withdrawal_id }}
+                    </span>
+                </td>
+                <td class="border-t">
+                    <span class="px-6 py-4 flex items-center">
+                        {{ withdrawal.amount }} {{ withdrawal.currency.symbol }}
+                    </span>
+                </td>
+                <td class="border-t">
+                    <span class="px-6 py-4 flex items-center">
+                        {{ withdrawal.fee }} {{ withdrawal.currency.symbol }}
+                    </span>
+                </td>
+                <td class="border-t">
+                    <span class="px-6 py-4 flex items-center">
+                        {{ withdrawal.amount - withdrawal.fee }} {{ withdrawal.currency.symbol }}
+                    </span>
+                </td>
+
+                <td class="border-t">
+                    <span class="px-6 py-4 flex flex-col items-left">
+                        <div class="d-block">{{ withdrawal.user.email }}</div>
+                        <div class="d-block">
+                            <badge v-if="withdrawal.type == 'perfectmoney'" @click.native="showBankInfo(withdrawal)" class="mr-2 cursor-pointer" :type="'green'">
+                                {{ 'Perfect Money' }} <font-awesome-icon icon="info-circle" class="ml-1" />
+                            </badge>
+                            <badge v-else @click.native="showBankInfo(withdrawal)" class="mr-2 cursor-pointer" :type="'indigo'">
+                                {{ 'Bank Info' }} <font-awesome-icon icon="info-circle" class="ml-1" />
+                            </badge>
+                        </div>
+                    </span>
+                </td>
+                <td class="border-t">
+                    <span v-if="withdrawal.status == 'pending'" class="px-6 py-4 flex items-center focus:text-indigo-500">
+                        <t-button-green @click="approve(withdrawal)" class="mr-2">Approve</t-button-green>
+                        <t-button-red @click="reject(withdrawal)">Reject</t-button-red>
+                    </span>
+                    <span v-else class="px-6 py-4 flex items-center focus:text-indigo-500">
+                        <badge @click.native="showBankInfo(withdrawal)" class="mr-2 cursor-pointer" type="gray">
+                                {{ 'Moderated' }}
+                            </badge>
+                    </span>
+                </td>
+            </tr>
+            <tr v-if="withdrawals.data.length === 0">
+                <td class="border-t px-6 py-2" colspan="100">No withdrawals found.</td>
+            </tr>
+        </table>
+    </div>
+    <pagination :links="withdrawals.links" />
+
+    <!-- Show Rejection Reason Modal -->
+    <jet-dialog-modal :show="showReasonModal" @close="closeReasonModal">
+        <template #title>
+            Rejected Reason
+        </template>
+
+        <template #content>
+            <div v-html="rejectedReason"></div>
+        </template>
+
+        <template #footer>
+            <jet-secondary-button @click.native="closeReasonModal">
+                Close
+            </jet-secondary-button>
+        </template>
+    </jet-dialog-modal>
+
+    <!-- Confirmation Modal -->
+    <jet-confirmation-modal :show="withdrawalBeingReviewed">
+        <template #title>
+            Confirmation modal
+        </template>
+
+        <template #content>
+            <div v-if="selectedAction == 'approve'">Are you sure you would like to {{ selectedAction }} the withdrawal?</div>
+
+            <div v-if="selectedAction == 'reject'" class="flex flex-wrap mt-5">
+                <small>Please write down the rejection reason</small>
+                <t-textarea v-model="rejectedReasonText" class="mt-5 w-full"></t-textarea>
+            </div>
+
+            <div v-if="selectedAction == 'approve'" class="flex flex-wrap mt-5">
+                <small>Please write down the note (e.g. Reference Code, if any), but it is optional.</small>
+                <t-textarea v-model="noteText" class="mt-5 w-full"></t-textarea>
+            </div>
+        </template>
+
+        <template #footer>
+            <jet-secondary-button @click.native="withdrawalBeingReviewed = null">
+                Nevermind
+            </jet-secondary-button>
+
+            <jet-danger-button class="ml-2" @click.native="confirmAction">
+                {{ selectedAction }}
+            </jet-danger-button>
+        </template>
+    </jet-confirmation-modal>
+
+    <!-- Show User Document Modal -->
+    <jet-dialog-modal :show="withdrawalBankInfoReviewed" @close="closeBankInfoModal">
+        <template #title>
+            Bank Info
+        </template>
+
+        <template #content>
+            <div>
+                <ul v-if="bankInfo.type == 'perfectmoney'">
+                    <li class="mb-5"><strong>Full Amount:</strong> {{ bankInfo.amount }} {{ bankInfo.currency.symbol }}</li>
+                    <li class="mb-5"><strong>Fee:</strong> {{ bankInfo.fee }} {{ bankInfo.currency.symbol }}</li>
+                    <li class="mb-5"><strong>Receive Amount:</strong> {{ bankInfo.amount - bankInfo.fee }} {{ bankInfo.currency.symbol }}</li>
+                    <li><strong>Account Name:</strong> {{ bankInfo.account_holder_address }}</li>
+                </ul>
+                <ul v-else>
+                    <li class="mb-5"><strong>Amount:</strong> {{ bankInfo.amount - bankInfo.fee }} {{ bankInfo.currency.symbol }}</li>
+                    <li><strong>Bank Name:</strong> {{ bankInfo.name }}</li>
+                    <li><strong>Bank Address:</strong> {{ bankInfo.address }}</li>
+                    <li><strong>Country:</strong> {{ bankInfo.country.name }}</li>
+                    <li><strong>IBAN:</strong> {{ bankInfo.iban }}</li>
+                    <li><strong>SWIFT:</strong> {{ bankInfo.swift }}</li>
+                    <li><strong>IFSC:</strong> {{ bankInfo.ifsc }}</li>
+                    <li><strong>IFSC:</strong> {{ bankInfo.ifsc }}</li>
+                    <li><strong>Account Holder Name:</strong> {{ bankInfo.account_holder_name }}</li>
+                    <li><strong>Account Holder Address:</strong> {{ bankInfo.account_holder_address }}</li>
+                </ul>
+            </div>
+        </template>
+
+        <template #footer>
+            <jet-secondary-button @click.native="closeBankInfoModal">
+                Close
+            </jet-secondary-button>
+        </template>
+    </jet-dialog-modal>
+</app-layout>

@@ -1,0 +1,34 @@
+
+@import "./setting-fonts";
+@import "./setting-typographia";
+@import "./setting-color";
+
+body {
+    font-family: 'Poppins', sans-serif;
+    font-weight: var(--medium-font);
+    font-size: var(--default-font__size);
+    margin: 0;
+    padding: 0;
+
+    color: var(--first-text-color);
+    background-color: var(--body-color);
+}
+
+body.dark {
+
+    .site-layout {
+        --tr-hover-color: #1d2234;
+        --border-line-color: #1d2234;
+        --rows-color: #1d2234;
+        --hover-v1-color: #FFC107;
+        --first-text-color: #B9BAC0;
+        --white-input: #131722;
+        --progress-color: #c19a23;
+        --select-option: #1d2234;
+
+        color: var(--dark-text-color);
+        background-color: var(--dark-body-color);
+
+    }
+}
+

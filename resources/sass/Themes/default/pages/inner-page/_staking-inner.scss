@@ -1,0 +1,194 @@
+
+
+.staking-inner {
+    max-width: 700px;
+    width: 100%;
+    // padding: 1rem;
+    font-size: 0.80rem;
+    // border: 1px solid rgba(40, 40, 75, 0.6);
+    // border-radius: 6px;
+
+    &__image {
+        margin-bottom: 2rem;
+
+        img {
+            display: block;
+            width: 100%;
+            border-radius: 6px;
+        }
+    }
+
+    &__options {
+        margin-bottom: 2rem;
+        padding: 0 0 2rem;
+    }
+
+    .options-item {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 0.3rem;
+        padding: 1rem 0 0.5rem;
+        border-bottom: 1px solid rgba(40, 40, 75, 0.6);
+        
+
+        &:nth-last-child(1) {
+            border-bottom: 1px solid rgba(40, 40, 75, 0.6) !important; 
+        }
+
+        &__title {
+            color: var(--second-text-color);
+        }
+
+        &__value {
+            color: var(--white-color);
+            text-align: right;
+
+            span {
+                color: var(--green-color);
+            }
+        }
+
+    }
+
+    &__calculator {
+        // outline: 1px solid #f00;
+
+        .components-filter__row {
+            margin-bottom: 2rem;
+        }
+
+        button {
+            position: relative;
+            display: inline-block;
+            font-size: 0.90rem;
+
+            text-decoration: none;
+            padding: 0.70rem 1.50rem;
+
+            color: var(--white-color);
+            background-color: #1d2234;
+
+            border: 1px solid var(--purple-color);
+            border-radius: 4px;
+
+            outline: none;
+
+            &:hover {
+                border: 1px solid var(--purple-color);
+                background-color: var(--purple-color);
+            }
+
+            &:focus {
+                outline: none;
+                border: 1px solid var(--purple-color);
+                background-color: var(--purple-color);
+            }
+
+            &:active {
+                outline: none;
+                border: 1px solid var(--purple-color);
+                background-color: var(--purple-color);
+            }
+
+            &-text {
+                font-size: 0.90rem;
+            }
+
+        }
+
+    }
+
+
+    .calculator-info {
+        margin-bottom: 2rem;
+        padding: 0 0 2rem;
+        // border-bottom: 1px solid rgba(40, 40, 75, 0.6);
+
+        &__item {display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.3rem;
+            text-align: right;
+        }
+
+        &__title {
+            color: var(--second-text-color);
+            text-align: left;
+        }
+
+    }
+
+    .calculator-form {
+        outline: none;
+
+        .components-filter__item {
+            max-width: 360px !important;
+            width: 100%;
+
+            button {
+                position: relative;
+                display: inline-block;
+                font-size: 0.90rem;
+
+                display: block;
+                width: 100%;
+
+                text-decoration: none;
+                padding: 0.70rem 1.50rem;
+
+                color: var(--white-color);
+                background-color: var(--purple-color);
+
+                border: 1px solid var(--purple-color);
+                border-radius: 4px;
+
+                outline: none;
+
+                &:hover {
+                    background-color: var(--purple-second-color);
+                }
+
+                &:focus {
+                    outline: none;
+                    background-color: var(--purple-second-color);
+                }
+
+                &:active {
+                    outline: none;
+                    background-color: var(--purple-color);
+                }
+
+                &-text {
+                    font-size: 0.90rem;
+                }
+            }
+
+        }
+
+    }
+
+}
+
+
+
+
+@media screen and (max-width: 1000px) {
+
+    .staking-inner {
+        max-width: 600px;
+        width: 100%;
+
+    }
+
+}
+
+
+@media screen and (max-width: 767px) {
+
+    .staking-inner {
+        max-width: 100%;
+        width: 100%;
+        margin: 0 auto;
+
+    }
+
+}

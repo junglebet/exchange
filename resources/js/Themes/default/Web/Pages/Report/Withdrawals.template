@@ -1,0 +1,258 @@
+<app-layout>
+
+<!-- components title start -->
+        <div class="components-title">
+            <h2>{{ $t('Transactions') }}</h2>
+        </div>
+        <!-- components title end -->
+
+        <reports-tab section="withdrawals"></reports-tab>
+
+
+        <div class="components-filter">
+                <div class="components-filter__row">
+                    <div class="components-filter__item">
+                        <label>{{ $t('Currency:') }}</label>
+                        <t-rich-user-select
+                            :options="currencies.data"
+                            v-model="form.currency"
+                            :placeholder="$t('Select currency')"
+                            value-attribute="id"
+                            text-attribute="name"
+                            :clearable="true"
+                        >
+                            <template
+                                slot="label"
+                                slot-scope="{ className, option, query }"
+                            >
+                                <div class="flex">
+                                    <div class="flex flex-col">
+                                        <span>{{ option.text }}</span>
+                                    </div>
+                                </div>
+                            </template>
+                        </t-rich-user-select>
+                    </div>
+                    <div class="components-filter__item">
+                        <text-user-input v-model="form.txn" :label="$t('Txn ID')" />
+                    </div>
+
+
+                    <div class="components-filter__item">
+                        <label>{{ $t('Status:') }}</label>
+                        <t-rich-user-select
+                            :options="[{'id': '', 'name': $t('All')},{'id': 'completed', 'name': $t('Completed')}, {'id': 'pending', 'name': $t('Pending')}, {'id': 'rejected', 'name': $t('Rejected')}, {'id': 'failed', 'name': $t('Failed')}]"
+                            v-model="form.status"
+                            :placeholder="$t('Select status')"
+                            value-attribute="id"
+                            text-attribute="name"
+                            :clearable="true"
+                        >
+                            <template
+                                slot="label"
+                                slot-scope="{ className, option, query }"
+                            >
+                                <div class="flex">
+                                    <div class="flex flex-col">
+                                        <span>{{ option.text }}</span>
+                                    </div>
+                                </div>
+                            </template>
+                        </t-rich-user-select>
+                    </div>
+
+                    <div class="components-filter__item">
+                        <t-button-green @click.stop="getList" class="components-filter__button mt-8 py-2 px-6" :class="{ 'opacity-75': sending }">
+                            <span class="components-filter__icon">
+                                <svg v-show="sending" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                                {{ $t('Search') }}
+                            </span>
+                        </t-button-green>
+                    </div>
+                </div>
+
+        </div>
+
+
+    <!-- table components start -->
+    <div class="table-components">
+
+        <!-- tables start -->
+        <table class="tables mob-table-withdrawals">
+            <!-- thead start -->
+            <thead class="table-sort no-cursor">
+            <tr>
+                <th>
+                    <div class="table-sort__value">
+                        <span class="table-sort__title">{{ $t('ID') }}</span>
+                    </div>
+                </th>
+                <th>
+                    <div class="table-sort__value">
+                        <span class="table-sort__title">{{ $t('Status') }}</span>
+                    </div>
+                </th>
+                <th>
+                    <div class="table-sort__value">
+                        <span class="table-sort__title">{{ $t('TXN') }}</span>
+                    </div>
+                </th>
+                <th>
+                    <div class="table-sort__value">
+                        <span class="table-sort__title">{{ $t('Amount') }}</span>
+                    </div>
+                </th>
+                <th>
+                    <div class="table-sort__value">
+                        <span class="table-sort__title">{{ $t('Address') }}</span>
+                    </div>
+                </th>
+                <th>
+                    <div class="table-sort__value">
+                        <span class="table-sort__title">{{ $t('Payment ID') }}</span>
+                    </div>
+                </th>
+                <th>
+                    <div class="table-sort__value">
+                        <span class="table-sort__title">{{ $t('Confirms') }}</span>
+                    </div>
+                </th>
+                <th>
+                    <div class="table-sort__value">
+                        <span class="table-sort__title">{{ $t('Date') }}</span>
+                    </div>
+                </th>
+            </tr>
+            </thead>
+            <!-- thead end -->
+
+
+            <!-- tbody start -->
+            <tbody class="table-list">
+            <tr v-for="withdrawal in withdrawals.data" :key="withdrawal.id">
+                <td>
+                    <div class="table-list__subtitle">{{ $t('ID') }}</div>
+                    <div class="table-list__value">
+                        <div class="table-list__text">
+                            {{ withdrawal.withdrawal_id }}
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div class="table-list__subtitle">{{ $t('Status') }}</div>
+                    <div class="table-list__value">
+                        <div v-if="withdrawal.status == 'completed'" class="components-label label-green mt-2">
+                            {{ $t('Completed') }}
+                        </div>
+                        <div v-if="withdrawal.status == 'pending'" class="components-label label-orange mt-2">
+                            {{ $t('Pending') }}
+                        </div>
+                        <div v-if="withdrawal.status == 'rejected'" class="components-label label-red mt-2">
+                            <span :title="withdrawal.rejected_reason">{{ $t('Rejected') }}</span>
+                        </div>
+                        <div v-if="withdrawal.status == 'failed'" class="components-label label-red mt-2">
+                            {{ $t('Failed') }}
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div class="table-list__subtitle">{{ $t('TXN') }}</div>
+                    <div class="table-list__value">
+                        <div class="table-list__text">
+                            {{ format_string(withdrawal.txn, 10) }}
+                            <a v-if="withdrawal.explorer" @click.stop="" target="_blank" :href="withdrawal.explorer" class="list-text__icon">
+                                <svg-icon icon="link" classname="list-text__icon-color"></svg-icon>
+                            </a>
+                            <span v-if="withdrawal.txn" @click="doCopy(withdrawal.txn)" class="list-text__icon">
+                                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <rect class="list-text__icon-color" x="1" y="2" width="17" height="16" rx="2"/>
+                                    <path class="list-text__icon-color" d="M18 4H18.4C19.8999 4 20.6498 4 21.1756 4.38197C21.3454 4.50533 21.4947 4.65464 21.618 4.82443C22 5.35016 22 6.10011 22 7.6V18.4C22 19.8999 22 20.6498 21.618 21.1756C21.4947 21.3454 21.3454 21.4947 21.1756 21.618C20.6498 22 19.9012 22 18.404 22C15.5371 22 11.3886 22 7.59963 22C6.09998 22 5.35016 22 4.82443 21.618C4.65464 21.4947 4.50533 21.3454 4.38197 21.1756C4 20.6498 4 19.8999 4 18.4V18"/>
+                                </svg>
+                            </span>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div class="table-list__subtitle">{{ $t('Amount') }}</div>
+                    <div class="table-list__value">
+                        <div class="table-list__text">
+                            {{ withdrawal.amount }} {{ withdrawal.symbol }}
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div class="table-list__subtitle">{{ $t('Address') }}</div>
+                    <div class="table-list__value">
+                        <div class="table-list__text">
+                            {{ format_string(withdrawal.address, 10) }}
+                            <span v-if="withdrawal.address" @click="doCopy(withdrawal.address)" class="list-text__icon">
+                                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <rect class="list-text__icon-color" x="1" y="2" width="17" height="16" rx="2"/>
+                                        <path class="list-text__icon-color" d="M18 4H18.4C19.8999 4 20.6498 4 21.1756 4.38197C21.3454 4.50533 21.4947 4.65464 21.618 4.82443C22 5.35016 22 6.10011 22 7.6V18.4C22 19.8999 22 20.6498 21.618 21.1756C21.4947 21.3454 21.3454 21.4947 21.1756 21.618C20.6498 22 19.9012 22 18.404 22C15.5371 22 11.3886 22 7.59963 22C6.09998 22 5.35016 22 4.82443 21.618C4.65464 21.4947 4.50533 21.3454 4.38197 21.1756C4 20.6498 4 19.8999 4 18.4V18"/>
+                                    </svg>
+                                </span>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div class="table-list__subtitle">{{ $t('Payment ID') }}</div>
+                    <div class="table-list__value">
+                        <div class="table-list__text">
+                            {{ format_string(withdrawal.payment_id, 5) }}
+                            <span v-if="withdrawal.payment_id" @click="doCopy(withdrawal.payment_id)" class="list-text__icon">
+                                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <rect class="list-text__icon-color" x="1" y="2" width="17" height="16" rx="2"/>
+                                        <path class="list-text__icon-color" d="M18 4H18.4C19.8999 4 20.6498 4 21.1756 4.38197C21.3454 4.50533 21.4947 4.65464 21.618 4.82443C22 5.35016 22 6.10011 22 7.6V18.4C22 19.8999 22 20.6498 21.618 21.1756C21.4947 21.3454 21.3454 21.4947 21.1756 21.618C20.6498 22 19.9012 22 18.404 22C15.5371 22 11.3886 22 7.59963 22C6.09998 22 5.35016 22 4.82443 21.618C4.65464 21.4947 4.50533 21.3454 4.38197 21.1756C4 20.6498 4 19.8999 4 18.4V18"/>
+                                    </svg>
+                                </span>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div class="table-list__subtitle">{{ $t('Confirms') }}</div>
+                    <div class="table-list__value">
+                        <div class="table-list__text">{{ withdrawal.confirms }}</div>
+                    </div>
+                </td>
+                <td>
+                    <div class="table-list__subtitle">{{ $t('Date') }}</div>
+                    <div class="table-list__value">
+                        <div class="table-list__text">{{ withdrawal.created_at }}</div>
+                    </div>
+                </td>
+            </tr>
+            </tbody>
+            <!-- tbody end -->
+
+            <!-- tfood start -->
+            <tfoot class="table-result">
+            <tr>
+                <td colspan="100">
+                    <div v-if="withdrawals.data.length === 0" class="table-result__notfound">
+                            <span class="table-result__notfound-icon">
+                                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path class="table-result__notfound-color" d="M21 13V11C21 7.73081 21 6.09621 20.3272 4.86413C19.8219 3.93873 19.0613 3.17807 18.1359 2.67277C16.9038 2 15.2692 2 12 2V2C8.73081 2 7.09621 2 5.86413 2.67277C4.93873 3.17807 4.17807 3.93873 3.67277 4.86413C3 6.09621 3 7.73081 3 11V12.5C3 16.2433 3 18.1149 3.87311 19.4735C4.29935 20.1368 4.86322 20.7006 5.52648 21.1269C6.88505 22 8.7567 22 12.5 22V22H13" stroke="#222628"/>
+                                    <line class="table-result__notfound-color" x1="15.5" y1="13.5" x2="7.5" y2="13.5"/>
+                                    <line class="table-result__notfound-color" x1="15.5" y1="10.5" x2="7.5" y2="10.5"/>
+                                    <line class="table-result__notfound-color" x1="11.5" y1="7.5" x2="7.5" y2="7.5"/>
+                                    <rect class="table-result__notfound-color color-yellow" x="14.8335" y="14.8335" width="7.08333" height="7.08333" rx="3.54167"/>
+                                    <line class="table-result__notfound-color color-yellow" x1="21.1803" y1="21.3066" x2="22.5565" y2="22.6829"/>
+                                </svg>
+                            </span>
+                        <span class="table-result__notfound-text">{{ $t('No withdrawals found.') }}</span>
+                    </div>
+                    <pagination :links="withdrawals.meta.links" />
+                </td>
+            </tr>
+            </tfoot>
+            <!-- tfood end -->
+
+        </table>
+        <!-- tables end -->
+    </div>
+
+    <!-- table components end -->
+</app-layout>

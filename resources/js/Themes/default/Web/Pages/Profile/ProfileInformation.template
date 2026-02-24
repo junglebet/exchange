@@ -1,0 +1,28 @@
+<div>
+    <div class="form-container profile-information">
+        <!-- form components start -->
+        <div class="form-components">
+
+            <div class="form-components__title"><h3>{{ $t('Account Information') }}</h3></div>
+            <div class="form-components__body">
+                <div class="form-components__input-text">
+                    <div class="form-components__block">
+                        <div class="form-components__block-item block-text">
+                            <p>{{ $t('Email:') }} <strong>{{ user.email }}</strong></p>
+                            <p class="mt-4">{{ $t('Two-Factor Authentication (2FA):') }} <strong>{{ user.two_factor_enabled ? 'Enabled' : 'Disabled'}}</strong></p>
+                            <p class="mt-4 ">
+                                {{ $t('Referral Link:') }} <strong>{{ route('register', { referral: user.referral_code }) }}</strong>
+                                <span @click="doCopy(this.route('register', { referral: user.referral_code}))" class="form-search__result-icon pt-1 ">
+                                    <svg-icon icon="copy" classname="form-search__result-color"></svg-icon>
+                                </span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <!-- form components end -->
+    </div>
+
+</div>

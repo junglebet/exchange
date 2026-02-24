@@ -1,0 +1,128 @@
+<app-layout>
+    <div class="overflow-x-auto">
+        <h1 class="mb-8 font-bold text-3xl">
+            <Link class="text-indigo-400 hover:text-indigo-600" :href="route('admin.dashboard')">Dashboard</Link>
+            - {{ 'System Monitor' }}
+        </h1>
+        <div class="flex items-center text-gray-800 mb-10">
+            <div class="w-full">
+                <div class="grid grid-cols-12 gap-4">
+                    <div class="col-span-12 sm:col-span-6 2xl:col-span-3">
+                        <Link :href="route('admin.users')">
+                            <div class="flex flex-row bg-white cursor-pointer shadow-sm rounded p-4">
+                                <div class="flex items-center justify-center flex-shrink-0 h-16 w-16 rounded-xl bg-green-100 text-green-500">
+                                    <font-awesome-icon size="2x" icon="user" />
+                                </div>
+                                <div class="flex flex-col flex-grow ml-4">
+                                    <div class="text-lg font-bold text-gray-600">Users</div>
+                                    <div class="mt-1 font-bold text-lg text-gray-500">{{ stats.users }}</div>
+                                </div>
+                                <div class="flex flex-col ml-4">
+                                    <font-awesome-icon size="1x" class="text-gray-400" icon="external-link-alt" />
+                                </div>
+                            </div>
+                        </Link>
+                    </div>
+                    <div class="col-span-12 sm:col-span-6 2xl:col-span-3">
+                        <Link :href="route('admin.markets')">
+                            <div class="flex flex-row bg-white cursor-pointer shadow-sm rounded p-4">
+                                <div class="flex items-center justify-center flex-shrink-0 h-16 w-16 rounded-xl bg-red-100 text-red-500">
+                                    <font-awesome-icon size="2x" icon="exchange-alt" />
+                                </div>
+                                <div class="flex flex-col flex-grow ml-4">
+                                    <div class="text-lg font-bold text-gray-600">Markets</div>
+                                    <div class="mt-1 font-bold text-lg text-gray-500">{{ stats.markets }}</div>
+                                </div>
+                                <div class="flex flex-col  ml-4">
+                                    <font-awesome-icon size="1x" class="text-gray-400" icon="external-link-alt" />
+                                </div>
+                            </div>
+                        </Link>
+                    </div>
+                    <div class="col-span-12 sm:col-span-6 2xl:col-span-3">
+                        <Link :href="route('admin.currencies')">
+                            <div class="flex flex-row bg-white cursor-pointer shadow-sm rounded p-4">
+                                <div class="flex items-center justify-center flex-shrink-0 h-16 w-16 rounded-xl bg-blue-100 text-blue-500">
+                                    <font-awesome-icon size="2x" icon="coins" />
+                                </div>
+                                <div class="flex flex-col flex-grow ml-4">
+                                    <div class="text-lg font-bold text-gray-600">Currencies</div>
+                                    <div class="mt-1 font-bold text-lg text-gray-500">{{ stats.currencies }}</div>
+                                </div>
+                                <div class="flex flex-col ml-4">
+                                    <font-awesome-icon size="1x" class="text-gray-400" icon="external-link-alt" />
+                                </div>
+                            </div>
+                        </Link>
+                    </div>
+                    <div class="col-span-12 sm:col-span-6 2xl:col-span-3">
+                        <Link :href="route('admin.kyc.documents')">
+                            <div class="flex flex-row bg-white cursor-pointer shadow-sm rounded p-4">
+                                <div class="flex items-center justify-center flex-shrink-0 h-16 w-16 rounded-xl bg-yellow-100 text-yellow-500">
+                                    <font-awesome-icon size="2x" icon="passport" />
+                                </div>
+                                <div class="flex flex-col flex-grow ml-4">
+                                    <div class="text-lg font-bold text-gray-600">KYC</div>
+                                    <div class="mt-1 font-bold text-lg text-gray-500">{{ stats.documents }}</div>
+                                </div>
+                                <div class="flex flex-col ml-4">
+                                    <font-awesome-icon size="1x" class="text-gray-400" icon="external-link-alt" />
+                                </div>
+                            </div>
+                        </Link>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mb-6 flex justify-between items-center">
+            <small>Version: <strong>6.0</strong></small>
+            <small>Synced: <strong>{{ last ? last : 'never' }}</strong>
+            </small>
+            <nav-button :class="{ 'opacity-75': loading }" @click.native="testServices">
+                <svg v-show="loading" class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                <span>Test</span>
+                <span class="hidden md:inline">&nbsp;all services</span>
+            </nav-button>
+        </div>
+        <div class="bg-white rounded shadow overflow-hidden w-full">
+            <section class="text-gray-600 body-font">
+                <div class="container px-5 flex flex-wrap">
+                    <div v-for="service in services" class="flex relative pb-5 sm:items-center lg:w-1/2 pt-10 pr-5" :class="{'pt-10' : service.order > 1, 'pt-5' : service.order == 1}">
+                        <div class="h-full w-6 absolute inset-0 flex items-center justify-center">
+                            <div class="h-full w-1 bg-gray-200 pointer-events-none"></div>
+                        </div>
+                        <div class="bg-gray-500 flex-shrink-0 w-6 h-6 rounded-full mt-10 sm:mt-0 inline-flex items-center justify-center text-white relative z-10 title-font font-medium text-sm">{{ service.order }}</div>
+                        <div class="flex-grow md:pl-8 pl-6 flex sm:items-center items-start flex-col sm:flex-row">
+                            <div :class="{'bg-green-100 text-green-500' : service.status == 'online', 'bg-red-100 text-red-500' : service.status == 'offline', 'bg-yellow-100 text-yellow-500' : service.status == 'maintenance', 'bg-gray-100 text-gray-500' : !service.status}" class="flex-shrink-0 w-12 h-12 rounded-full inline-flex items-center justify-center">
+                                <font-awesome-icon :icon="service.icon" />
+                            </div>
+                            <div class="flex-grow sm:pl-6 mt-6 sm:mt-0">
+                                <h2 class="font-medium title-font text-gray-900 mb-1 text-xl">
+                                    {{ service.title }}
+                                    <badge v-if="!service.status" class="ml-2" type="gray">
+                                        not checked
+                                    </badge>
+                                    <badge v-if="service.status == 'online'" class="ml-2" type="green">
+                                        online
+                                    </badge>
+                                    <badge v-if="service.status == 'offline'" class="ml-2" type="red">
+                                        offline
+                                    </badge>
+                                    <badge v-if="service.status == 'maintenance'" class="ml-2" type="orange">
+                                        maintenance
+                                    </badge>
+                                </h2>
+                                <p class="leading-relaxed">{{ service.description }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+</app-layout>

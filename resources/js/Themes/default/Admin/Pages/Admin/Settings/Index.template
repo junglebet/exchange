@@ -1,0 +1,479 @@
+<app-layout>
+    <h1 class="mb-8 font-bold text-3xl">
+        Settings
+    </h1>
+
+    <div class="tabs">
+        <div class="tabs-left">
+            <div class="tabs-nav">
+                <div @click="setSection('general')" class="tabs-nav__item" :class="{'tabs-nav__active': section == 'general'}">
+                    <h4>General</h4>
+                </div>
+                <div @click="setSection('trade')" class="tabs-nav__item" :class="{'tabs-nav__active': section == 'trade'}">
+                    <h4>Trade</h4>
+                </div>
+                <div @click="setSection('mail')" class="tabs-nav__item" :class="{'tabs-nav__active': section == 'mail'}">
+                    <h4>Mail</h4>
+                </div>
+                <div @click="setSection('notification')" class="tabs-nav__item" :class="{'tabs-nav__active': section == 'notification'}">
+                    <h4>Notification</h4>
+                </div>
+                <div @click="setSection('coinpayments')" class="tabs-nav__item" :class="{'tabs-nav__active': section == 'coinpayments'}">
+                    <h4>Coinpayments</h4>
+                </div>
+                <div @click="setSection('ethereum')" class="tabs-nav__item" :class="{'tabs-nav__active': section == 'ethereum'}">
+                    <h4>Ethereum & ERC</h4>
+                </div>
+                <div @click="setSection('bnb')" class="tabs-nav__item" :class="{'tabs-nav__active': section == 'bnb'}">
+                    <h4>BNB & BEP</h4>
+                </div>
+                <div @click="setSection('tron')" class="tabs-nav__item" :class="{'tabs-nav__active': section == 'tron'}">
+                    <h4>TRON & TRC</h4>
+                </div>
+                <div @click="setSection('bitcoin')" class="tabs-nav__item" :class="{'tabs-nav__active': section == 'bitcoin'}">
+                    <h4>Bitcoin & BRC</h4>
+                </div>
+                <div @click="setSection('polygon')" class="tabs-nav__item" :class="{'tabs-nav__active': section == 'polygon'}">
+                    <h4>Polygon</h4>
+                </div>
+                <div @click="setSection('stripe')" class="tabs-nav__item" :class="{'tabs-nav__active': section == 'stripe'}">
+                    <h4>Stripe</h4>
+                </div>
+                <div @click="setSection('recaptcha')" class="tabs-nav__item" :class="{'tabs-nav__active': section == 'recaptcha'}">
+                    <h4>Recaptcha</h4>
+                </div>
+                <div @click="setSection('social')" class="tabs-nav__item" :class="{'tabs-nav__active': section == 'social'}">
+                    <h4>Social</h4>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div v-if="Object.keys(validationErrors).length !== 0" class="pb-8 w-full">
+        <div class="bg-red-400 border border-red-400 text-white px-4 py-3 rounded relative" role="alert">
+            <strong class="font-bold">Form Validation Errors</strong>
+            <span class="block">
+                <p v-for="error in validationErrors">
+                    {{ error }}
+                </p>
+            </span>
+        </div>
+    </div>
+
+    <div v-if="section == 'general'" class="bg-white rounded shadow overflow-hidden w-full">
+        <form @submit.prevent="submit('general')">
+            <div class="p-8 -mr-6 -mb-8 flex flex-wrap">
+
+                <div class="pr-6 pb-8 w-full">
+                    <div class="font-weight-bold text-xl border-b mb-2 pb-4 font-medium">General Settings</div>
+                </div>
+
+                <text-input v-model="general.name" class="pr-6 pb-8 w-full lg:w-1/2" label="Site Name" />
+
+                <empty-column></empty-column>
+
+                <div class="pr-6 pb-8 w-full lg:w-1/2">
+                    <label class="form-label block mr-2 mb-3">Enable Maintenance Mode</label>
+                    <t-toggle v-model="general.maintenance_status" />
+                </div>
+
+                <div class="pr-6 pb-8 w-full lg:w-1/2">
+                    <label class="form-label block mr-2 mb-3">Enable KYC</label>
+                    <t-toggle v-model="general.kyc_status" />
+                </div>
+
+                <!--<div class="pr-6 pb-8 w-full lg:w-1/2">
+                    <label class="form-label block mr-2 mb-3">Enable Language Switcher</label>
+                    <t-toggle v-model="general.language_status" />
+                </div>-->
+
+                <div class="pr-6 pb-8 w-full lg:w-1/2">
+                    <label class="form-label block mr-2 mb-3">Enable Dark Mode</label>
+                    <t-toggle v-model="general.dark_mode_status" />
+                </div>
+
+                <div class="pr-6 pb-8 w-full lg:w-1/2">
+                    <label class="form-label block mr-2 mb-3">Dark Mode By Default</label>
+                    <t-toggle v-model="general.default_dark_mode_status" />
+                </div>
+
+                <div id="file-uploader-form" class="pr-6 pb-8 w-full">
+                    <div class="border-b mt-10 mb-2 pb-2">Site Logo:</div>
+
+                    <VueFileAgent
+                        class="profile-pic-upload-block"
+                        ref="fileUploadForm"
+                        :multiple="false"
+                        :deletable="false"
+                        :meta="false"
+                        :compact="true"
+                        :accept="'image/*'"
+                        :helpText="'Drag an image file here'"
+                        :errorText="{
+                              type: 'Please select an image',
+                            }"
+                        v-model="siteLogo"
+                        @select="onSelect($event)"
+                        @upload="onUpload($event)"
+                    >
+                        <template v-slot:before-outer>
+                        </template >
+                        <template v-slot:after-outer>
+                            <div title="after-outer">
+                                <div class="mb-4">
+                                    <small>Allowed types: <strong>jpg, png.</strong></small>
+                                    <small>Max filesize: <strong>1MB</strong></small>
+                                </div>
+                                <div class="drop-help-text">
+                                    <p class="text-success">Drop the file!</p>
+                                </div>
+                                <button type="button" class="flex justify-between items-center py-2 border-radius-xl px-4 bg-red-500 text-sm rounded text-gray-100 cursor-pointer hover:bg-red-600 hover:text-gray-100 focus:outline-none" :class="[uploaded ? 'btn-danger' : 'btn-secondary']" v-if="siteLogo" @click="removePic()">Remove</button>
+                                <div class="clearfix"></div>
+                            </div>
+                        </template >
+                    </VueFileAgent>
+                </div>
+
+                <text-input v-model="general.withdrawal_limit" class="pr-6 pb-8 w-full lg:w-1/2" label="24h Withdrawal Limit KYC (in USD)" />
+
+                <text-input v-model="general.withdrawal_limit_kyc" class="pr-6 pb-8 w-full lg:w-1/2" label="24h Withdrawal Limit NON-KYC (in USD)" />
+
+                <text-input v-model="general.swap_market" class="pr-6 pb-8 w-full lg:w-1/2" label="Default Market Name For Swap" />
+
+            </div>
+            <div class="px-8 py-4 bg-gray-100 border-t border-gray-200 flex items-center">
+                <loading-button :loading="sending" class="btn-indigo ml-auto" type="submit">Update General Settings</loading-button>
+            </div>
+        </form>
+    </div>
+
+    <div v-if="section == 'trade'" class="bg-white rounded shadow overflow-hidden w-full">
+        <form @submit.prevent="submit('trade')">
+            <div class="p-8 -mr-6 -mb-8 flex flex-wrap">
+
+                <div class="pr-6 pb-8 w-full">
+                    <div class="font-weight-bold text-xl border-b mb-2 pb-4 font-medium">Trade Settings</div>
+                </div>
+
+                <text-input v-model="trade.maker_fee" class="pr-6 pb-8 w-full lg:w-1/2" label="Maker Fee (%)" />
+
+                <text-input v-model="trade.taker_fee" class="pr-6 pb-8 w-full lg:w-1/2" label="Taker Fee (%)" />
+
+                <text-input v-model="trade.referral_fee" class="pr-6 pb-8 w-full lg:w-1/2" label="Referral Fee (%)" />
+
+                <div class="pr-6 pb-8 w-full lg:w-1/2">
+                    <label class="form-label block mr-2 mb-3">Disable Trades</label>
+                    <t-toggle v-model="trade.disable_trades" />
+                </div>
+            </div>
+            <div class="px-8 py-4 bg-gray-100 border-t border-gray-200 flex items-center">
+                <loading-button :loading="sending" class="btn-indigo ml-auto" type="submit">Update Trade Settings</loading-button>
+            </div>
+        </form>
+    </div>
+
+    <div v-if="section == 'mail'" class="bg-white rounded shadow overflow-hidden w-full">
+        <form @submit.prevent="submit('mail')">
+            <div class="p-8 -mr-6 -mb-8 flex flex-wrap">
+
+                <div class="pr-6 pb-8 w-full">
+                    <div class="font-weight-bold text-xl border-b mb-2 pb-4 font-medium">Mail Settings</div>
+                </div>
+
+                <text-input v-model="mail.mail_mailer" class="pr-6 pb-8 w-full lg:w-1/2" label="Type (SMTP, API etc)" />
+                <text-input v-model="mail.mail_host" class="pr-6 pb-8 w-full lg:w-1/2" label="SMTP Host" />
+                <text-input v-model="mail.mail_port" class="pr-6 pb-8 w-full lg:w-1/2" label="SMTP Port" />
+                <text-input v-model="mail.mail_username" class="pr-6 pb-8 w-full lg:w-1/2" label="Username" />
+                <text-input v-model="mail.mail_password" class="pr-6 pb-8 w-full lg:w-1/2" label="Password" />
+                <text-input v-model="mail.mail_from_name" class="pr-6 pb-8 w-full lg:w-1/2" label="Sender Name" />
+                <text-input v-model="mail.mail_from_address" class="pr-6 pb-8 w-full lg:w-1/2" label="Sender Email Address" />
+                <text-input v-model="mail.mail_encryption" class="pr-6 pb-8 w-full lg:w-1/2" label="Encryption (SSL, TLS etc)" />
+
+            </div>
+            <div class="px-8 py-4 bg-gray-100 border-t border-gray-200 flex items-center">
+                <loading-button :loading="sending" class="btn-indigo ml-auto" type="submit">Update Mail Settings</loading-button>
+            </div>
+        </form>
+    </div>
+
+    <div v-if="section == 'recaptcha'" class="bg-white rounded shadow overflow-hidden w-full">
+        <form @submit.prevent="submit('recaptcha')">
+            <div class="p-8 -mr-6 -mb-8 flex flex-wrap">
+
+                <div class="pr-6 pb-8 w-full">
+                    <div class="font-weight-bold text-xl border-b mb-2 pb-4 font-medium">Recaptcha Settings</div>
+                </div>
+
+                <div class="pr-6 pb-8 w-full">
+                    <label class="form-label block mr-2 mb-3">Enable Recaptcha</label>
+                    <t-toggle v-model="recaptcha.status" />
+                </div>
+
+                <text-input v-model="recaptcha.site_key" class="pr-6 pb-8 w-full lg:w-1/2" label="Site Key" />
+                <text-input v-model="recaptcha.secret_key" class="pr-6 pb-8 w-full lg:w-1/2" label="Secret Key" />
+
+            </div>
+            <div class="px-8 py-4 bg-gray-100 border-t border-gray-200 flex items-center">
+                <loading-button :loading="sending" class="btn-indigo ml-auto" type="submit">Update Recaptcha Settings</loading-button>
+            </div>
+        </form>
+    </div>
+
+    <div v-if="section == 'coinpayments'" class="bg-white rounded shadow overflow-hidden w-full">
+        <form @submit.prevent="submit('coinpayments')">
+            <div class="p-8 -mr-6 -mb-8 flex flex-wrap">
+
+                <div class="pr-6 pb-8 w-full">
+                    <div class="font-weight-bold text-xl border-b mb-2 pb-4 font-medium">Coinpayments Settings</div>
+                </div>
+
+                <text-input v-model="coinpayments.ipn_secret" class="pr-6 pb-8 w-full lg:w-1/2" label="IPN Secret" />
+                <text-input v-model="coinpayments.public_key" class="pr-6 pb-8 w-full lg:w-1/2" label="Public Key" />
+                <text-input v-model="coinpayments.private_key" class="pr-6 pb-8 w-full lg:w-1/2" label="Private Key" />
+                <text-input v-model="coinpayments.merchant_id" class="pr-6 pb-8 w-full lg:w-1/2" label="Merchant ID" />
+
+                <div class="pr-6 pb-8 w-full">
+                    <label class="form-label block mr-2 mb-3">Pay Deposit Fee (0.5%)</label>
+                    <t-toggle v-model="coinpayments.pay_deposit_fee" />
+                </div>
+
+            </div>
+            <div class="px-8 py-4 bg-gray-100 border-t border-gray-200 flex items-center">
+                <button class="focus:outline-none text-red-600 hover:underline" tabindex="-1" type="button" @click="syncCoins">Sync Coinpayments Currencies</button>
+                <loading-button :loading="sending" class="btn-indigo ml-auto" type="submit">Update Coinpayments Settings</loading-button>
+            </div>
+        </form>
+    </div>
+
+    <div v-if="section == 'coinpayments'" class="bg-white rounded shadow overflow-hidden w-full mt-10">
+        <div class="p-8 -mr-6 -mb-8 flex flex-wrap">
+            <div class="pr-6 pb-8 w-full">
+                <div class="font-weight-bold text-xl border-b mb-2 pb-4 font-medium">Coinpayments Coins</div>
+            </div>
+            <table class="w-full whitespace-no-wrap">
+                <tr class="text-left font-bold">
+                    <th class="px-6 pt-6 pb-4">Name</th>
+                    <th class="px-6 pt-6 pb-4">Symbol</th>
+                    <th class="px-6 pt-6 pb-4">Fee</th>
+                    <th class="px-6 pt-6 pb-4">Deposit Confirms</th>
+                    <th class="px-6 pt-6 pb-4">Status</th>
+                </tr>
+                <tr v-for="currency in coinpaymentsCurrencies" class="hover:bg-gray-100 focus-within:bg-gray-100">
+                    <td class="border-t">
+                        <span class="px-6 py-4 flex items-center focus:text-indigo-500">
+                            {{ currency.name }}
+                        </span>
+                    </td>
+                    <td class="border-t">
+                        <span class="px-6 py-4 flex items-center focus:text-indigo-500">
+                            {{ currency.symbol }}
+                        </span>
+                    </td>
+                    <td class="border-t">
+                        <span class="px-6 py-4 flex items-center focus:text-indigo-500">
+                            {{ currency.fee }}
+                        </span>
+                    </td>
+                    <td class="border-t">
+                        <span class="px-6 py-4 flex items-center focus:text-indigo-500">
+                            {{ currency.confirmations }}
+                        </span>
+                    </td>
+                    <td class="border-t">
+                        <span class="px-6 py-4 flex items-center focus:text-indigo-500">
+                            <badge class="mr-2" :type="currency.status == 'online' ? 'green' : 'gray'">
+                                {{ currency.status == "online" ? 'Online' : 'Maintenance' }}
+                            </badge>
+                        </span>
+                    </td>
+                </tr>
+                <tr v-if="coinpaymentsCurrencies.length === 0">
+                    <td class="border-t px-6 py-4" colspan="100">Coins are not synced yet.</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <div v-if="section == 'ethereum'" class="bg-white rounded shadow overflow-hidden w-full">
+        <form @submit.prevent="submit('ethereum')">
+            <div class="p-8 -mr-6 -mb-8 flex flex-wrap">
+
+                <div class="pr-6 pb-8 w-full">
+                    <div class="font-weight-bold text-xl border-b mb-2 pb-4 font-medium">Ethereum Settings</div>
+                </div>
+
+                <text-input v-model="ethereum.wallet" class="pr-6 pb-8 w-full lg:w-1/2" label="Wallet" />
+                <text-input v-model="ethereum.private_key" class="pr-6 pb-8 w-full lg:w-1/2" label="Private Key" />
+
+            </div>
+            <div class="px-8 py-4 bg-gray-100 border-t border-gray-200 flex items-center">
+                <loading-button :loading="sending" class="btn-indigo ml-auto" type="submit">Update Ethereum Settings</loading-button>
+            </div>
+        </form>
+    </div>
+
+    <div v-if="section == 'bnb'" class="bg-white rounded shadow overflow-hidden w-full">
+        <form @submit.prevent="submit('bnb')">
+            <div class="p-8 -mr-6 -mb-8 flex flex-wrap">
+
+                <div class="pr-6 pb-8 w-full">
+                    <div class="font-weight-bold text-xl border-b mb-2 pb-4 font-medium">Binance Smart Chain Settings</div>
+                </div>
+
+                <text-input v-model="bnb.wallet" class="pr-6 pb-8 w-full lg:w-1/2" label="Wallet" />
+                <text-input v-model="bnb.private_key" class="pr-6 pb-8 w-full lg:w-1/2" label="Private Key" />
+
+            </div>
+            <div class="px-8 py-4 bg-gray-100 border-t border-gray-200 flex items-center">
+                <loading-button :loading="sending" class="btn-indigo ml-auto" type="submit">Update BNB Settings</loading-button>
+            </div>
+        </form>
+    </div>
+
+    <div v-if="section == 'polygon'" class="bg-white rounded shadow overflow-hidden w-full">
+        <form @submit.prevent="submit('polygon')">
+            <div class="p-8 -mr-6 -mb-8 flex flex-wrap">
+
+                <div class="pr-6 pb-8 w-full">
+                    <div class="font-weight-bold text-xl border-b mb-2 pb-4 font-medium">Polygon Settings</div>
+                </div>
+
+                <text-input v-model="polygon.wallet" class="pr-6 pb-8 w-full lg:w-1/2" label="Wallet" />
+                <text-input v-model="polygon.private_key" class="pr-6 pb-8 w-full lg:w-1/2" label="Private Key" />
+
+            </div>
+            <div class="px-8 py-4 bg-gray-100 border-t border-gray-200 flex items-center">
+                <loading-button :loading="sending" class="btn-indigo ml-auto" type="submit">Update Polygon Settings</loading-button>
+            </div>
+        </form>
+    </div>
+
+    <div v-if="section == 'tron'" class="bg-white rounded shadow overflow-hidden w-full">
+        <form @submit.prevent="submit('tron')">
+            <div class="p-8 -mr-6 -mb-8 flex flex-wrap">
+
+                <div class="pr-6 pb-8 w-full">
+                    <div class="font-weight-bold text-xl border-b mb-2 pb-4 font-medium">Tron Settings</div>
+                </div>
+
+                <text-input v-model="tron.wallet" class="pr-6 pb-8 w-full lg:w-1/2" label="Wallet" />
+                <text-input v-model="tron.private_key" class="pr-6 pb-8 w-full lg:w-1/2" label="Private Key" />
+
+            </div>
+            <div class="px-8 py-4 bg-gray-100 border-t border-gray-200 flex items-center">
+                <loading-button :loading="sending" class="btn-indigo ml-auto" type="submit">Update Tron Settings</loading-button>
+            </div>
+        </form>
+    </div>
+
+    <div v-if="section == 'bitcoin'" class="bg-white rounded shadow overflow-hidden w-full">
+        <form @submit.prevent="submit('bitcoin')">
+            <div class="p-8 -mr-6 -mb-8 flex flex-wrap">
+
+                <div class="pr-6 pb-8 w-full">
+                    <div class="font-weight-bold text-xl border-b mb-2 pb-4 font-medium">Bitcoin Settings</div>
+                </div>
+
+                <text-input v-model="bitcoin.wallet" class="pr-6 pb-8 w-full lg:w-1/2" label="Wallet" />
+
+            </div>
+            <div class="px-8 py-4 bg-gray-100 border-t border-gray-200 flex items-center">
+                <loading-button :loading="sending" class="btn-indigo ml-auto" type="submit">Update Bitcoin Settings</loading-button>
+            </div>
+        </form>
+    </div>
+
+    <div v-if="section == 'stripe'" class="bg-white rounded shadow overflow-hidden w-full">
+        <form @submit.prevent="submit('stripe')">
+            <div class="p-8 -mr-6 -mb-8 flex flex-wrap">
+
+                <div class="pr-6 pb-8 w-full">
+                    <div class="font-weight-bold text-xl border-b mb-2 pb-4 font-medium">Stripe Settings</div>
+                </div>
+
+                <text-input v-model="stripe.public_key" class="pr-6 pb-8 w-full lg:w-1/2" label="Public Key" />
+                <text-input v-model="stripe.secret_key" class="pr-6 pb-8 w-full lg:w-1/2" label="Secret Key" />
+                <text-input v-model="stripe.currency" class="pr-6 pb-8 w-full lg:w-1/2" label="Base Currency" />
+
+
+            </div>
+            <div class="px-8 py-4 bg-gray-100 border-t border-gray-200 flex items-center">
+                <loading-button :loading="sending" class="btn-indigo ml-auto" type="submit">Update Stripe Settings</loading-button>
+            </div>
+        </form>
+    </div>
+
+    <div v-if="section == 'notification'" class="bg-white rounded shadow overflow-hidden w-full">
+        <form @submit.prevent="submit('notification')">
+            <div class="p-8 -mr-6 -mb-8 flex flex-wrap">
+
+                <div class="pr-6 pb-8 w-full">
+                    <div class="font-weight-bold text-xl border-b mb-2 pb-4 font-medium">Notification Settings</div>
+                </div>
+
+                <text-input v-model="notification.admin_email" class="pr-6 pb-8 w-full" label="Admin Email (this address receives all enabled email notifications)" />
+
+                <div class="pr-6 pb-8 w-full lg:w-1/2">
+                    <label class="form-label block mr-2 mb-3">Crypto Deposits Email</label>
+                    <t-toggle v-model="notification.crypto_deposits" />
+                </div>
+
+                <div class="pr-6 pb-8 w-full lg:w-1/2">
+                    <label class="form-label block mr-2 mb-3">Crypto Withdrawals Email</label>
+                    <t-toggle v-model="notification.crypto_withdrawals" />
+                </div>
+
+                <div class="pr-6 pb-8 w-full lg:w-1/2">
+                    <label class="form-label block mr-2 mb-3">Fiat Deposits Email</label>
+                    <t-toggle v-model="notification.fiat_deposits" />
+                </div>
+
+                <div class="pr-6 pb-8 w-full lg:w-1/2">
+                    <label class="form-label block mr-2 mb-3">Fiat Withdrawals Email</label>
+                    <t-toggle v-model="notification.fiat_withdrawals" />
+                </div>
+
+                <div class="pr-6 pb-8 w-full lg:w-1/2">
+                    <label class="form-label block mr-2 mb-3">KYC Received Email</label>
+                    <t-toggle v-model="notification.kyc_received" />
+                </div>
+
+                <div class="pr-6 pb-8 w-full lg:w-1/2">
+                    <label class="form-label block mr-2 mb-3">New User Registered Email</label>
+                    <t-toggle v-model="notification.new_user_registered" />
+                </div>
+
+            </div>
+            <div class="px-8 py-4 bg-gray-100 border-t border-gray-200 flex items-center">
+                <loading-button :loading="sending" class="btn-indigo ml-auto" type="submit">Update Notification Settings</loading-button>
+            </div>
+        </form>
+    </div>
+
+    <div v-if="section == 'social'" class="bg-white rounded shadow overflow-hidden w-full">
+        <form @submit.prevent="submit('social')">
+            <div class="p-8 -mr-6 -mb-8 flex flex-wrap">
+
+                <div class="pr-6 pb-8 w-full">
+                    <div class="font-weight-bold text-xl border-b mb-2 pb-4 font-medium">Social Networks</div>
+                </div>
+
+                <text-input v-model="social.youtube" class="pr-6 pb-8 w-full lg:w-1/2" label="Youtube" />
+                <text-input v-model="social.telegram" class="pr-6 pb-8 w-full lg:w-1/2" label="Telegram" />
+                <text-input v-model="social.facebook" class="pr-6 pb-8 w-full lg:w-1/2" label="Facebook" />
+                <text-input v-model="social.twitter" class="pr-6 pb-8 w-full lg:w-1/2" label="Twitter" />
+                <text-input v-model="social.reddit" class="pr-6 pb-8 w-full lg:w-1/2" label="Reddit" />
+                <text-input v-model="social.instagram" class="pr-6 pb-8 w-full lg:w-1/2" label="Instagram" />
+                <text-input v-model="social.medium" class="pr-6 pb-8 w-full lg:w-1/2" label="Medium" />
+                <text-input v-model="social.vk" class="pr-6 pb-8 w-full lg:w-1/2" label="VK" />
+                <text-input v-model="social.discord" class="pr-6 pb-8 w-full lg:w-1/2" label="Discord" />
+                <text-input v-model="social.coinmarketcap" class="pr-6 pb-8 w-full lg:w-1/2" label="Coinmarketcap" />
+                <text-input v-model="social.github" class="pr-6 pb-8 w-full lg:w-1/2" label="Github" />
+                <text-input v-model="social.linkedin" class="pr-6 pb-8 w-full lg:w-1/2" label="Linkedin" />
+            </div>
+            <div class="px-8 py-4 bg-gray-100 border-t border-gray-200 flex items-center">
+                <loading-button :loading="sending" class="btn-indigo ml-auto" type="submit">Update Social Networks</loading-button>
+            </div>
+        </form>
+    </div>
+</app-layout>

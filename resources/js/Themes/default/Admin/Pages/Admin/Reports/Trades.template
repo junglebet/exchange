@@ -1,0 +1,77 @@
+<app-layout>
+    <admin-reports-tab :referrer="filters.referrer" section="trades"></admin-reports-tab>
+    <h1 class="mt-10 mb-8 font-bold text-3xl">
+        <Link class="text-indigo-400 hover:text-indigo-600" :href="route('admin.users.edit', filters.referrer)" v-if="filters.referrer">Go Back - </Link> Trades
+    </h1>
+    <div class="mb-6 flex justify-between items-center">
+        <search-filter v-model="form.search" class="w-full max-w-md mr-4 focus:outline-none" @reset="reset"></search-filter>
+    </div>
+    <div class="bg-white rounded shadow overflow-x-auto">
+        <table class="w-full whitespace-no-wrap">
+            <tr class="text-left font-bold">
+                <th class="px-3 pt-6 pb-4">ID</th>
+                <th class="px-3 pt-6 pb-4">Market</th>
+                <th class="px-3 pt-6 pb-4">Type</th>
+                <th class="px-3 pt-6 pb-4">Executed Price</th>
+                <th class="px-3 pt-6 pb-4">Fee</th>
+                <th class="px-3 pt-6 pb-4">Amount (Quote)</th>
+                <th class="px-3 pt-6 pb-4">Amount (Base)</th>
+                <th class="px-3 pt-6 pb-4">User</th>
+                <th class="px-3 pt-6 pb-4">Date</th>
+            </tr>
+            <tr v-for="transaction in transactions.data" :key="transaction.id" class="hover:bg-gray-100 focus-within:bg-gray-100">
+                <td class="border-t">
+                    <span class="px-3 py-2 flex items-center">
+                        {{ transaction.id }}
+                    </span>
+                </td>
+                <td class="border-t">
+                    <span class="px-3 py-2 flex items-center">
+                        {{ transaction.market.name }}
+                    </span>
+                </td>
+                <td class="border-t">
+                    <span class="px-3 py-2 flex items-center">
+                        <badge class="mr-2" :type="transaction.order_side == 'buy' ? 'green' : 'red'">
+                            {{ transaction.order_side }} {{ transaction.order_type }} <font-awesome-icon :icon="transaction.order_side == 'buy' ? 'arrow-up' : 'arrow-down'" class="ml-1" />
+                        </badge>
+                    </span>
+                </td>
+                <td class="border-t">
+                    <span class="px-3 py-2 flex items-center">
+                        {{ transaction.price }} {{ transaction.market.quote_currency.symbol }}
+                    </span>
+                </td>
+                <td class="border-t">
+                    <span class="px-3 py-2 flex items-center">
+                        {{ transaction.fee }} {{ transaction.market.quote_currency.symbol }}
+                    </span>
+                </td>
+                <td class="border-t">
+                    <span class="px-3 py-2 flex items-center">
+                        {{ transaction.base_currency }} {{ transaction.market.base_currency.symbol }}
+                    </span>
+                </td>
+                <td class="border-t">
+                    <span class="px-3 py-2 flex items-center">
+                        {{ transaction.quote_currency }} {{ transaction.market.quote_currency.symbol }}
+                    </span>
+                </td>
+                <td class="border-t">
+                    <span class="px-3 py-2 flex items-center">
+                        {{ transaction.user.email }}<br> ID: {{ transaction.user.id }}
+                    </span>
+                </td>
+                <td class="border-t">
+                    <span class="px-3 py-2 flex items-center">
+                        {{ transaction.created_at }}
+                    </span>
+                </td>
+            </tr>
+            <tr v-if="transactions.data.length === 0">
+                <td class="border-t px-3 py-2" colspan="100">No transactions found.</td>
+            </tr>
+        </table>
+    </div>
+    <pagination :links="transactions.links" />
+</app-layout>

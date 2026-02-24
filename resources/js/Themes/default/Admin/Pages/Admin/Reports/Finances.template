@@ -1,0 +1,223 @@
+<app-layout>
+    <admin-reports-tab :referrer="filters.referrer" section="finances"></admin-reports-tab>
+    <h1 class="mt-10 mb-8 font-bold text-3xl">
+        Finances
+    </h1>
+    <div class="flex flex-wrap">
+        <div class="pr-6 pb-8 lg:w-1/2" v-if="!filters.referrer">
+            <label class="form-label d-block">Report:</label>
+            <t-rich-select
+                :options="types"
+                v-model="form.type"
+                placeholder="Select report"
+                value-attribute="id"
+                text-attribute="name"
+            >
+                <template
+                    slot="label"
+                    slot-scope="{ className, option, query }"
+                >
+                    <div class="flex">
+                        <div class="flex flex-col ml-2 text-gray-800">
+                            <strong>{{ option.text }}</strong>
+                        </div>
+                    </div>
+                </template>
+            </t-rich-select>
+        </div>
+
+        <div class="pr-6 pb-8 pt-1 lg:w-1/2" v-if="!filters.referrer">
+            <label class="form-label d-block">Period:</label>
+            <t-datepicker
+                :monthsPerView="2"
+                v-model="form.period"
+                :range="true"
+                :timepicker="false"
+                dateFormat="Y-m-d"
+                userFormat="Y-m-d"
+                :weekStart="1"
+            />
+        </div>
+
+    </div>
+    <div class="bg-white rounded shadow overflow-x-auto">
+        <table v-if="form.type == 'trades' && form.period" class="w-full whitespace-no-wrap">
+            <tr class="text-left font-bold">
+                <th class="px-3 pt-6 pb-4">Market</th>
+                <th class="px-3 pt-6 pb-4">Income From Trades</th>
+                <th class="px-3 pt-6 pb-4">Referral Earnings</th>
+                <th class="px-3 pt-6 pb-4">Number of Trades</th>
+                <th class="px-3 pt-6 pb-4">Base Volume</th>
+                <th class="px-3 pt-6 pb-4">Quote Volume</th>
+            </tr>
+            <tr v-for="report in reports" class="hover:bg-gray-100 focus-within:bg-gray-100">
+                <td class="border-t">
+                    <span class="px-3 py-2 flex items-center">
+                        {{ report.name }}
+                    </span>
+                </td>
+                <td class="border-t">
+                    <span class="px-3 py-2 flex items-center">
+                        {{ math_formatter(report.income, 8) }} {{ report.symbol }}
+                    </span>
+                </td>
+                <td class="border-t">
+                    <span class="px-3 py-2 flex items-center">
+                        {{ math_formatter(report.referrals, 8) }} {{ report.symbol }}
+                    </span>
+                </td>
+                <td class="border-t">
+                    <span class="px-3 py-2 flex items-center">
+                        {{ report.total }}
+                    </span>
+                </td>
+                <td class="border-t">
+                    <span class="px-3 py-2 flex items-center">
+                        {{ math_formatter(report.basevolume, 8) }} {{ report.basesymbol }}
+                    </span>
+                </td>
+                <td class="border-t">
+                    <span class="px-3 py-2 flex items-center">
+                        {{ math_formatter(report.quotevolume, 8) }} {{ report.symbol }}
+                    </span>
+                </td>
+            </tr>
+            <tr v-if="!reports">
+                <td class="border-t px-3 py-2" colspan="100">No reports found.</td>
+            </tr>
+        </table>
+        <table v-if="form.type == 'deposits' && form.period" class="w-full whitespace-no-wrap">
+            <tr class="text-left font-bold">
+                <th class="px-3 pt-6 pb-4">Currency</th>
+                <th class="px-3 pt-6 pb-4">Deposit Amount</th>
+                <th class="px-3 pt-6 pb-4">Income From Deposits</th>
+                <th class="px-3 pt-6 pb-4">Number of Deposits</th>
+            </tr>
+            <tr v-for="report in reports" class="hover:bg-gray-100 focus-within:bg-gray-100">
+                <td class="border-t">
+                    <span class="px-3 py-2 flex items-center">
+                        {{ report.name }}
+                    </span>
+                </td>
+                <td class="border-t">
+                    <span class="px-3 py-2 flex items-center">
+                        {{ math_formatter(report.volume, 8) }} {{ report.name }}
+                    </span>
+                </td>
+                <td class="border-t">
+                    <span class="px-3 py-2 flex items-center">
+                        {{ math_formatter(report.income, 8) }} {{ report.name }}
+                    </span>
+                </td>
+                <td class="border-t">
+                    <span class="px-3 py-2 flex items-center">
+                        {{ report.total }}
+                    </span>
+                </td>
+            </tr>
+            <tr v-if="!reports">
+                <td class="border-t px-3 py-2" colspan="100">No reports found.</td>
+            </tr>
+        </table>
+        <table v-if="form.type == 'withdrawals' && form.period" class="w-full whitespace-no-wrap">
+            <tr class="text-left font-bold">
+                <th class="px-3 pt-6 pb-4">Currency</th>
+                <th class="px-3 pt-6 pb-4">Withdrawal Amount</th>
+                <th class="px-3 pt-6 pb-4">Income From Withdrawals</th>
+                <th class="px-3 pt-6 pb-4">Number of Withdrawals</th>
+            </tr>
+            <tr v-for="report in reports" class="hover:bg-gray-100 focus-within:bg-gray-100">
+                <td class="border-t">
+                    <span class="px-3 py-2 flex items-center">
+                        {{ report.name }}
+                    </span>
+                </td>
+                <td class="border-t">
+                    <span class="px-3 py-2 flex items-center">
+                        {{ math_formatter(report.volume, 8) }} {{ report.name }}
+                    </span>
+                </td>
+                <td class="border-t">
+                    <span class="px-3 py-2 flex items-center">
+                        {{ math_formatter(report.income, 8) }} {{ report.name }}
+                    </span>
+                </td>
+                <td class="border-t">
+                    <span class="px-3 py-2 flex items-center">
+                        {{ report.total }}
+                    </span>
+                </td>
+            </tr>
+            <tr v-if="!reports">
+                <td class="border-t px-3 py-2" colspan="100">No reports found.</td>
+            </tr>
+        </table>
+
+        <table v-if="form.type == 'fiat_deposits' && form.period" class="w-full whitespace-no-wrap">
+            <tr class="text-left font-bold">
+                <th class="px-3 pt-6 pb-4">Currency</th>
+                <th class="px-3 pt-6 pb-4">Deposit Amount</th>
+                <th class="px-3 pt-6 pb-4">Income From Deposits</th>
+                <th class="px-3 pt-6 pb-4">Number of Deposits</th>
+            </tr>
+            <tr v-for="report in reports" class="hover:bg-gray-100 focus-within:bg-gray-100">
+                <td class="border-t">
+                    <span class="px-3 py-2 flex items-center">
+                        {{ report.name }}
+                    </span>
+                </td>
+                <td class="border-t">
+                    <span class="px-3 py-2 flex items-center">
+                        {{ math_formatter(report.volume, 8) }} {{ report.name }}
+                    </span>
+                </td>
+                <td class="border-t">
+                    <span class="px-3 py-2 flex items-center">
+                        {{ math_formatter(report.income, 8) }} {{ report.name }}
+                    </span>
+                </td>
+                <td class="border-t">
+                    <span class="px-3 py-2 flex items-center">
+                        {{ report.total }}
+                    </span>
+                </td>
+            </tr>
+            <tr v-if="!reports">
+                <td class="border-t px-3 py-2" colspan="100">No reports found.</td>
+            </tr>
+        </table>
+        <table v-if="form.type == 'fiat_withdrawals' && form.period" class="w-full whitespace-no-wrap">
+            <tr class="text-left font-bold">
+                <th class="px-3 pt-6 pb-4">Currency</th>
+                <th class="px-3 pt-6 pb-4">Withdrawal Amount</th>
+                <th class="px-3 pt-6 pb-4">Income From Withdrawals</th>
+                <th class="px-3 pt-6 pb-4">Number of Withdrawals</th>
+            </tr>
+            <tr v-for="report in reports" class="hover:bg-gray-100 focus-within:bg-gray-100">
+                <td class="border-t">
+                    <span class="px-3 py-2 flex items-center">
+                        {{ report.name }}
+                    </span>
+                </td>
+                <td class="border-t">
+                    <span class="px-3 py-2 flex items-center">
+                        {{ math_formatter(report.volume, 8) }} {{ report.name }}
+                    </span>
+                </td>
+                <td class="border-t">
+                    <span class="px-3 py-2 flex items-center">
+                        {{ math_formatter(report.income, 8) }} {{ report.name }}
+                    </span>
+                </td>
+                <td class="border-t">
+                    <span class="px-3 py-2 flex items-center">
+                        {{ report.total }}
+                    </span>
+                </td>
+            </tr>
+            <tr v-if="!reports">
+                <td class="border-t px-3 py-2" colspan="100">No reports found.</td>
+            </tr>
+        </table>
+    </div>
+</app-layout>

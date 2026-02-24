@@ -1,0 +1,16 @@
+<?php
+
+const NETWORK_INTERNAL = 0;
+const NETWORK_COINPAYMENTS = 1;
+const NETWORK_ETH = 2;
+const NETWORK_ERC = 3;
+const NETWORK_BANK = 4;
+const NETWORK_BNB = 5;
+const NETWORK_BEP = 6;
+const NETWORK_TRX = 7;
+const NETWORK_TRC = 8;
+const NETWORK_BTC = 9;
+const NETWORK_BTC_FORK = 10;
+const NETWORK_MATIC = 15;
+const NETWORK_MATIC20 = 16;
+const NETWORK_BRC20 = 17;

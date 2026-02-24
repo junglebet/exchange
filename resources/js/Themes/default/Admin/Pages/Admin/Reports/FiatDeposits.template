@@ -1,0 +1,193 @@
+<app-layout>
+    <admin-reports-tab :referrer="filters.referrer" section="fiat_deposits"></admin-reports-tab>
+    <h1 class="mt-10 mb-8 font-bold text-3xl">
+        <Link class="text-indigo-400 hover:text-indigo-600" :href="route('admin.users.edit', filters.referrer)" v-if="filters.referrer">Go Back - </Link> Fiat Deposits
+    </h1>
+    <div class="mb-6 flex justify-between items-center">
+        <search-filter v-model="form.search" class="w-full max-w-md mr-4 focus:outline-none" @reset="reset">
+            <label class="block text-gray-700">Type:</label>
+            <select v-model="form.type" class="mt-1 w-full form-select rounded">
+                <option :value="null">All</option>
+                <option value="bank">Bank Transfers</option>
+                <option value="cc">Bank Cards</option>
+            </select>
+        </search-filter>
+    </div>
+    <div class="bg-white rounded shadow overflow-x-auto">
+        <table class="w-full whitespace-no-wrap">
+            <tr class="text-left font-bold">
+                <th class="px-6 pt-6 pb-4">Status</th>
+                <th class="px-6 pt-6 pb-4">ID</th>
+                <th class="px-6 pt-6 pb-4">Method</th>
+                <th class="px-6 pt-6 pb-4">Amount</th>
+                <th class="px-6 pt-6 pb-4">Fee</th>
+                <th class="px-6 pt-6 pb-4">Receipt</th>
+                <th class="px-6 pt-6 pb-4">User</th>
+                <th class="px-6 pt-6 pb-4">User Note</th>
+                <th class="px-6 pt-6 pb-4">Actions</th>
+            </tr>
+            <tr v-for="deposit in deposits.data" :key="deposit.id" class="hover:bg-gray-100 focus-within:bg-gray-100">
+                <td class="border-t">
+                    <span class="px-6 py-4 flex items-center focus:text-indigo-500">
+                        <badge v-if="deposit.status == 'confirmed'" class="mr-2" type="green">
+                            {{ 'Confirmed' }}
+                        </badge>
+                        <badge v-if="deposit.status == 'pending'" class="mr-2" type="orange">
+                            {{ 'Pending' }}
+                        </badge>
+                        <badge v-if="deposit.status == 'rejected'" class="mr-2" type="red">
+                            {{ 'Rejected' }}
+                            <t-dropdown
+                                variant="tooltip"
+                                toggle-on-hover
+                            >
+                              <span
+                                  slot="trigger"
+                                  class="text-white"
+                              >
+                                <font-awesome-icon icon="info-circle" class="ml-1" />
+                              </span>
+
+                              <template>
+                                  <div class="p-5 text-red-500" v-html="deposit.note"></div>
+                              </template>
+                            </t-dropdown>
+                        </badge>
+                    </span>
+                </td>
+                <td class="border-t">
+                    <span class="px-6 py-4 flex items-center">
+                        {{ deposit.deposit_id }}
+                    </span>
+                </td>
+                <td class="border-t">
+                    <span class="px-6 py-4 flex items-center">
+                        <badge v-if="deposit.type == 'cc'" class="mr-2" type="indigo">
+                            {{ 'Card' }}
+                        </badge>
+                        <badge v-if="deposit.type == 'bank'" class="mr-2" type="gray">
+                            {{ 'Bank' }}
+                        </badge>
+                        <badge v-if="deposit.type == 'ach'" class="mr-2" type="green">
+                            {{ 'ACH' }}
+                        </badge>
+                    </span>
+                </td>
+                <td class="border-t">
+                    <span class="px-6 py-4 flex items-center">
+                        {{ deposit.amount }} {{ deposit.currency.symbol }}
+                    </span>
+                </td>
+                <td class="border-t">
+                    <span class="px-6 py-4 flex items-center">
+                        {{ deposit.fee }} {{ deposit.currency.symbol }}
+                    </span>
+                </td>
+                <td class="border-t">
+                    <div class="px-6 py-4 flex items-center">
+                        <font-awesome-icon @click="showModal(deposit.receipt)" icon="external-link-alt" class="text-gray-600 cursor-pointer" />
+                    </div>
+                </td>
+                <td class="border-t">
+                    <span class="px-6 py-4 flex items-center">
+                        {{ deposit.user.email }}<br> ID: {{ deposit.user.id }}
+                    </span>
+                </td>
+                <td class="border-t">
+                    <span v-if="deposit.note" class="px-6 py-4 flex items-center">
+                        <t-dropdown
+                            variant="tooltip"
+                            toggle-on-hover
+                        >
+                          <span
+                              slot="trigger"
+                              class="text-gray-500"
+                          >
+                            <font-awesome-icon icon="info-circle" />
+                          </span>
+
+                          <template>
+                              <div class="p-5">{{ deposit.note }}</div>
+                          </template>
+                        </t-dropdown>
+                    </span>
+                </td>
+                <td class="border-t">
+                    <span v-if="deposit.status == 'pending'" class="px-6 py-4 flex items-center focus:text-indigo-500">
+                        <t-button-green @click="approve(deposit)" class="mr-2">Approve</t-button-green>
+                        <t-button-red @click="reject(deposit)">Reject</t-button-red>
+                    </span>
+                </td>
+            </tr>
+            <tr v-if="deposits.data.length === 0">
+                <td class="border-t px-6 py-2" colspan="100">No deposits found.</td>
+            </tr>
+        </table>
+    </div>
+    <pagination :links="deposits.links" />
+
+    <!-- Show User Document Modal -->
+    <jet-dialog-modal :show="showReceipt" @close="closeModal">
+        <template #title>
+            Deposit Receipt
+        </template>
+
+        <template #content>
+            <div v-if="receipt">
+                <div class="text-center mb-5">
+                    <a :href="receipt.url" target="_blank" class="text-indigo-500">Open Full Receipt</a>
+                </div>
+                <img width="100%" :src="receipt.url" />
+            </div>
+        </template>
+
+        <template #footer>
+            <jet-secondary-button @click.native="closeModal">
+                Close
+            </jet-secondary-button>
+        </template>
+    </jet-dialog-modal>
+
+    <!-- Show Rejection Reason Modal -->
+    <jet-dialog-modal :show="showReasonModal" @close="closeReasonModal">
+        <template #title>
+            Rejected Reason
+        </template>
+
+        <template #content>
+            <div v-html="rejectedReason"></div>
+        </template>
+
+        <template #footer>
+            <jet-secondary-button @click.native="closeReasonModal">
+                Close
+            </jet-secondary-button>
+        </template>
+    </jet-dialog-modal>
+
+    <!-- Confirmation Modal -->
+    <jet-confirmation-modal :show="depositBeingReviewed">
+        <template #title>
+            Confirmation modal
+        </template>
+
+        <template #content>
+            <div v-if="selectedAction == 'approve'">Are you sure you would like to {{ selectedAction }} the deposit?</div>
+
+            <div v-if="selectedAction == 'reject'" class="flex flex-wrap">
+                Please write down the rejection reason
+                <t-textarea v-model="rejectedReasonText" class="mt-5 w-full"></t-textarea>
+            </div>
+        </template>
+
+        <template #footer>
+            <jet-secondary-button @click.native="depositBeingReviewed = null">
+                Nevermind
+            </jet-secondary-button>
+
+            <jet-danger-button class="ml-2" @click.native="confirmAction">
+                {{ selectedAction }}
+            </jet-danger-button>
+        </template>
+    </jet-confirmation-modal>
+</app-layout>

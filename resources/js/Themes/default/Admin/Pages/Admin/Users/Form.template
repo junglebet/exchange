@@ -1,0 +1,143 @@
+<app-layout>
+    <h1 class="mb-8 font-bold text-3xl">
+        <Link class="text-indigo-400 hover:text-indigo-600" :href="route('admin.users')">Users</Link>
+        - {{ subTitle }}
+    </h1>
+
+    <div class="tabs">
+        <div class="tabs-left">
+            <div class="tabs-nav">
+                <Link
+                    :href="route('admin.users.edit', model.id)"
+                    :data="{ referrer: model.id }"
+                    class="tabs-nav__item tabs-nav__active"
+                    as="div"
+                >
+                    General
+                </Link>
+                <Link
+                    :href="route('admin.reports.wallets')"
+                    :data="{ referrer: model.id }"
+                    class="tabs-nav__item"
+                    :class="{'tabs-nav__active': section == 'general'}"
+                    as="div"
+                >
+                    Wallets
+                </Link>
+                <Link
+                    :href="route('admin.kyc.documents')"
+                    :data="{ referrer: model.id }"
+                    class="tabs-nav__item"
+                    as="div"
+                >
+                    KYC Documents
+                </Link>
+                <Link
+                    :href="route('admin.reports.deposits')"
+                    :data="{ referrer: model.id }"
+                    class="tabs-nav__item"
+                    as="div"
+                >
+                    Coin Deposits
+                </Link>
+                <Link
+                    :href="route('admin.reports.deposits.fiat')"
+                    :data="{ referrer: model.id }"
+                    class="tabs-nav__item"
+                    as="div"
+                >
+                    Fiat Deposits
+                </Link>
+                <Link
+                    :href="route('admin.reports.withdrawals')"
+                    :data="{ referrer: model.id }"
+                    class="tabs-nav__item"
+                    as="div"
+                >
+                    Coin Withdrawals
+                </Link>
+                <Link
+                    :href="route('admin.reports.withdrawals.fiat')"
+                    :data="{ referrer: model.id }"
+                    class="tabs-nav__item"
+                    as="div"
+                >
+                    Fiat Withdrawals
+                </Link>
+                <Link
+                    :href="route('admin.reports.trades')"
+                    :data="{ referrer: model.id }"
+                    class="tabs-nav__item"
+                    as="div"
+                >
+                    Trades
+                </Link>
+                <Link
+                    :href="route('admin.reports.referral-transactions')"
+                    :data="{ referrer: model.id }"
+                    class="tabs-nav__item"
+                    as="div"
+                >
+                    Referral Earnings
+                </Link>
+            </div>
+        </div>
+    </div>
+
+    <div class="bg-white rounded shadow lg:w-1/2">
+        <form @submit.prevent="submit">
+            <div class="p-8 -mr-6 -mb-8 flex flex-wrap">
+                <div class="pr-6 pb-8 w-full">
+                    <div class="font-weight-bold text-xl border-b mb-2 pb-4 font-medium">General Information</div>
+                </div>
+
+                <div v-if="isEdit" class="pr-6 pb-8 w-full">
+
+                    <div class="mb-2">
+                        Name:
+                        <strong>
+                            {{ form.name }}
+                        </strong>
+                    </div>
+                    <div class="mb-2">
+                        Email:
+                        <strong>
+                            {{ form.email }}
+                        </strong>
+                    </div>
+                    <div class="mb-2">
+                        Registration Date:
+                        <strong>
+                            {{ form.created_at }}
+                        </strong>
+                    </div>
+                </div>
+                <div class="pr-6 pb-8 w-full lg:w-1/2">
+                    <label class="form-label block mr-2 mb-3">User Deactivated</label>
+                    <t-toggle v-model="form.deactivated" />
+                    <div class="text-red-600 mb-3" v-if="errors.deactivated">
+                        {{ errors.deactivated }}
+                    </div>
+                </div>
+                <div class="pr-6 pb-8 w-full lg:w-1/2">
+                    <label class="form-label block mr-2 mb-3">KYC Verified</label>
+                    <t-toggle v-model="form.kyc_verified" />
+                    <div class="text-red-600 mb-3" v-if="errors.kyc_verified">
+                        {{ errors.kyc_verified }}
+                    </div>
+                </div>
+                <div class="pr-6 pb-8 w-full lg:w-1/2">
+                    <label class="form-label block mr-2 mb-3">Email Verified</label>
+                    <t-toggle v-model="form.email_verified" />
+                    <div class="text-red-600 mb-3" v-if="errors.email_verified">
+                        {{ errors.email_verified }}
+                    </div>
+                </div>
+            </div>
+            <div class="px-8 py-4 bg-gray-100 border-t border-gray-200 flex items-center">
+                <button v-if="!form.deleted" class="focus:outline-none text-red-600 hover:underline" tabindex="-1" type="button" @click="destroy">Delete User</button>
+                <loading-button :loading="sending" class="btn-indigo ml-auto" type="submit">{{ actionButtonTitle }}</loading-button>
+            </div>
+        </form>
+    </div>
+</app-layout>

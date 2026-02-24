@@ -1,0 +1,33 @@
+:root:not(.theme-dark) {
+	--tv-color-platform-background: #01081e;
+	--tv-color-pane-background: #01081e;
+	--tv-color-toolbar-button-background-hover: #02091c;
+	--tv-color-toolbar-button-background-expanded: #5eaeff;
+	--tv-color-toolbar-button-background-active: #5eaeff;
+	--tv-color-toolbar-button-background-active-hover: #5eaeff;
+	--tv-color-toolbar-button-text: #758696;
+	--tv-color-toolbar-button-text-hover: #758696;
+	--tv-color-toolbar-button-text-active: #5eaeff;
+	--tv-color-toolbar-button-text-active-hover: #5eaeff;
+	--tv-color-item-active-text: rgb(6, 6, 255);
+	--tv-color-toolbar-toggle-button-background-active: #5eaeff;
+	--tv-color-toolbar-toggle-button-background-active-hover: #758696;
+	--tv-color-toolbar-divider-background: #01081e;
+	--tv-color-toolbar-save-layout-loader: rgb(106, 109, 120);
+}
+
+.paneSeparator-ZR_yhubO {
+    background-color: #01081e !important;
+}
+
+.chart-container-border {
+    background: #01081e;
+}
+
+.time-axis div, .fixed-gear-eYu3weXF {
+    background: #01081e !important;
+}
+
+.time-axis canvas, .fixed-gear-eYu3weXF canvas {
+    top: -3px !important;
+}

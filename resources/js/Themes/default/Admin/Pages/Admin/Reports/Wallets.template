@@ -1,0 +1,126 @@
+<app-layout>
+    <admin-reports-tab :referrer="filters.referrer" section="wallets"></admin-reports-tab>
+    <h1 class="mt-10 mb-8 font-bold text-3xl">
+        <Link class="text-indigo-400 hover:text-indigo-600" :href="route('admin.users.edit', filters.referrer)" v-if="filters.referrer">Go Back - </Link> User Wallets
+    </h1>
+    <div class="mb-6 flex justify-between items-center">
+        <search-filter v-model="form.search" class="w-full max-w-md mr-4 focus:outline-none" @reset="reset">
+            <label class="block text-gray-700">Wallets:</label>
+            <select v-model="form.type" class="mt-1 w-full form-select rounded">
+                <option value="all">All</option>
+                <option value="balance">With Balance Only</option>
+            </select>
+        </search-filter>
+    </div>
+    <div class="pr-6 pb-8 w-full lg:w-1/4" v-if="!filters.referrer">
+        <label class="form-label d-block">User:</label>
+        <t-rich-select
+            :fetch-options="fetchUser"
+            v-model="form.user"
+            placeholder="Select user"
+            value-attribute="id"
+            text-attribute="email"
+            :minimum-input-length="2"
+        >
+            <template
+                slot="label"
+                slot-scope="{ className, option, query }"
+            >
+                <div class="flex">
+                    <div class="flex flex-col ml-2 text-gray-800">
+                        <strong>{{ option.text }}</strong>
+                    </div>
+                </div>
+            </template>
+        </t-rich-select>
+    </div>
+    <div class="bg-white rounded shadow overflow-x-auto">
+        <table class="w-full whitespace-no-wrap">
+            <tr class="text-left font-bold">
+                <th class="px-3 pt-6 pb-4">Currency</th>
+                <th class="px-3 pt-6 pb-4">Address</th>
+                <th class="px-3 pt-6 pb-4">Wallet</th>
+                <th class="px-3 pt-6 pb-4">In Orders</th>
+                <th class="px-3 pt-6 pb-4">Pending Withdraw</th>
+                <th class="px-3 pt-6 pb-4">User</th>
+                <th class="px-3 pt-6 pb-4">Action</th>
+            </tr>
+            <tr v-for="wallet in wallets.data" :key="wallet.id" class="hover:bg-gray-100 focus-within:bg-gray-100">
+                <td class="border-t">
+                    <span class="px-3 py-2 flex items-center">
+                        {{ wallet.currency.symbol }}
+                    </span>
+                </td>
+                <td class="border-t">
+                    <span class="px-3 py-2 flex items-center">
+                        <div v-if="wallet.currency.type == 'fiat'">
+                            {{ '' }}
+                        </div>
+                        <div v-else-if="wallet.address">
+                            {{ format_string(wallet.address.address, 10) }}
+                            <font-awesome-icon class="ml-2 cursor-pointer" icon="copy" @click="doCopy(wallet.address.address)" />
+                        </div>
+                        <div v-else>
+
+                        </div>
+                    </span>
+                </td>
+                <td class="border-t">
+                    <span class="px-3 py-2 flex items-center">
+                        {{ wallet.balance_in_wallet }} {{ wallet.currency.symbol }}
+                    </span>
+                </td>
+                <td class="border-t">
+                    <span class="px-3 py-2 flex items-center">
+                        {{ wallet.balance_in_order }} {{ wallet.currency.symbol }}
+                    </span>
+                </td>
+                <td class="border-t">
+                    <span class="px-3 py-2 flex items-center">
+                        {{ wallet.balance_in_withdraw }} {{ wallet.currency.symbol }}
+                    </span>
+                </td>
+                <td class="border-t">
+                    <span class="px-3 py-2 flex items-center">
+                        {{ wallet.user.email }}
+                    </span>
+                </td>
+                <td class="border-t">
+                    <span class="px-3 py-2 flex items-center">
+                        <t-button-green @click="transfer(wallet)" class="mr-2">Fund</t-button-green>
+                    </span>
+                </td>
+            </tr>
+            <tr v-if="wallets.data.length === 0">
+                <td class="border-t px-3 py-2" colspan="100">No wallets found.</td>
+            </tr>
+        </table>
+    </div>
+    <pagination :links="wallets.links" />
+
+    <!-- Confirmation Modal -->
+    <jet-dialog-modal v-if="selectedWallet" :show="selectedWallet">
+        <template #title>
+            <div class="mb-5">Internal Transfer</div>
+            <br><strong>Wallet:</strong> {{ selectedWallet.currency.name }}
+            <br><strong>User:</strong> ({{ selectedWallet.user.email}})
+        </template>
+
+        <template #content>
+            <div class="flex flex-wrap mt-10">
+                Deposit Amount:
+                <text-input type="number" v-model="deposit" class="mt-5 w-full"></text-input>
+            </div>
+        </template>
+
+        <template #footer>
+            <jet-secondary-button @click.native="selectedWallet = null; deposit = 0;">
+                Close
+            </jet-secondary-button>
+
+            <jet-success-button class="ml-2" @click.native="transferConfirm">
+                Deposit
+            </jet-success-button>
+        </template>
+    </jet-dialog-modal>
+</app-layout>

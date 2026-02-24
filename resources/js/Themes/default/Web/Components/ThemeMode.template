@@ -1,0 +1,3 @@
+<div class="header-mode">
+    <button @click="setThemeMode(isDarkTheme ? 'light' : 'dark')" class="mode"></button>
+</div>

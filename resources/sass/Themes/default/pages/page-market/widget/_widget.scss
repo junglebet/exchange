@@ -1,0 +1,43 @@
+
+
+.widget {
+
+    .mobile-head-title {
+        display: none;
+    }
+
+    /*
+    &-container {
+
+    }
+
+    &-head {
+
+    }
+
+    &-body {
+
+    }
+    */
+
+    &-empty {
+        color: var(--second-text-color);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        min-height: 346px;
+
+        span {
+            font-size: 0.90rem;
+        }
+
+    }
+
+}
+
+@import "widget-stats";
+@import "widget-markets";
+@import "widget-market-trades";
+
+

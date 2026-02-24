@@ -1,0 +1,48 @@
+:root {
+    --tv-color-pane-background: #131723;
+    --tv-color-platform-background: #1d2234;
+    --tv-color-toolbar-button-background-hover: #1c1c31;
+    --tv-color-toolbar-button-text: #8B8D98;
+    --tv-color-toolbar-button-text-hover: #8B8D98;
+}
+
+.dialog-2APwxL3O {
+    background-color: var(--tv-color-toolbar-button-background-hover) !important;
+}
+
+h3 {
+    color: #cacbce !important;
+}
+
+span {
+    color: #cacbce !important;
+}
+
+.menuBox-20sJGjtG div, .menuWrap-1gEtmoET {
+    background-color: var(--tv-color-toolbar-button-background-hover) !important;
+}
+
+html.theme-dark .menuWrap-1gEtmoET {
+    box-shadow: 0 2px 4px 0 #151525;
+}
+
+
+html.theme-dark .container-1e-eHKCj:not(.disabled-3lywlGlv):hover {
+    background-color: #303254 !important;
+}
+
+.chart-widget__bottom--themed-dark .control-bar__btn {
+    box-shadow: 0 2px 6px #131723 !important;
+}
+
+html.theme-dark .button-13wlLwhJ.isOpened-1939ai3F.hover-3L87f6Kw:before, html.theme-dark .button-13wlLwhJ.isOpened-1939ai3F:active:before, html.theme-dark .button-13wlLwhJ.isOpened-1939ai3F:before {
+    background-color: #303254 !important;
+}
+
+html.theme-dark .button-2ioYhFEY.isInteractive-20uLObIc.isOpened-p-Ume5l9.hover-yHQNmTbI:before, html.theme-dark .button-2ioYhFEY.isInteractive-20uLObIc.isOpened-p-Ume5l9:active:before, html.theme-dark .button-2ioYhFEY.isInteractive-20uLObIc.isOpened-p-Ume5l9:before {
+    background-color: #303254 !important;
+}
+
+html.theme-dark .container-RYiwcUsM {
+    background: #303254;
+}

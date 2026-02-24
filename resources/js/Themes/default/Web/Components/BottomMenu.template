@@ -1,0 +1,49 @@
+<div class="mobbar">
+    <div class="mobbar__row">
+        <Link as="div" class="mobbar__link" :href="route('markets')" :class="{'active': isUrl('market')}">
+            <span class="mobbar__icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M17 2.75H7C4.65279 2.75 2.75 4.65279 2.75 7V17C2.75 19.3472 4.65279 21.25 7 21.25H17C19.3472 21.25 21.25 19.3472 21.25 17V7C21.25 4.65279 19.3472 2.75 17 2.75Z" stroke="white" stroke-width="1.5"/>
+                    <path d="M8.25 11.75V16.25" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+                    <path d="M12.25 7.75V16.25" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+                    <path d="M16.25 10.75V16.25" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+            </span>
+            <h4>{{ $t('Markets') }}</h4>
+        </Link>
+        <Link as="div" class="mobbar__link" :href="route('orders')" :class="{'active': isUrl('orders')}">
+            <span class="mobbar__icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M17 2.75H7C4.65279 2.75 2.75 4.65279 2.75 7V17C2.75 19.3472 4.65279 21.25 7 21.25H17C19.3472 21.25 21.25 19.3472 21.25 17V7C21.25 4.65279 19.3472 2.75 17 2.75Z" stroke="white" stroke-opacity="0.8" stroke-width="1.5"/>
+                    <path d="M7 15.8L8.125 17L10 15" stroke="white" stroke-opacity="0.8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M7 7.8L8.125 9L10 7" stroke="white" stroke-opacity="0.8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M13 8H17" stroke="white" stroke-opacity="0.8" stroke-width="1.5" stroke-linecap="round"/>
+                    <path d="M13 16H17" stroke="white" stroke-opacity="0.8" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+            </span>
+            <h4>{{ $t('Orders') }}</h4>
+        </Link>
+        <Link as="div" class="mobbar__link" :href="route('wallets')" :class="{'active': isUrl('wallets')}">
+            <span class="mobbar__icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M19 9.75H18C16.7574 9.75 15.75 10.7574 15.75 12C15.75 13.2426 16.7574 14.25 18 14.25H19C20.2426 14.25 21.25 13.2426 21.25 12C21.25 10.7574 20.2426 9.75 19 9.75Z" stroke="white" stroke-opacity="0.8" stroke-width="1.5"/>
+                    <path d="M10 5.5H13C14.928 5.5 16.2231 5.50319 17.1892 5.63307C18.1121 5.75715 18.5071 5.9716 18.7678 6.23223C19.0284 6.49287 19.2428 6.88786 19.3669 7.81078C19.4457 8.39683 19.4779 9.10395 19.491 10H20.9913C20.9554 7.52043 20.7715 6.11466 19.8284 5.17157C18.6569 4 16.7712 4 13 4H10C6.22876 4 4.34315 4 3.17157 5.17157C2 6.34315 2 8.22876 2 12C2 15.7712 2 17.6569 3.17157 18.8284C4.34315 20 6.22876 20 10 20H13C16.7712 20 18.6569 20 19.8284 18.8284C20.7715 17.8853 20.9554 16.4796 20.9913 14H19.491C19.4779 14.896 19.4457 15.6032 19.3669 16.1892C19.2428 17.1121 19.0284 17.5071 18.7678 17.7678C18.5071 18.0284 18.1121 18.2428 17.1892 18.3669C16.2231 18.4968 14.928 18.5 13 18.5H10C8.07198 18.5 6.77686 18.4968 5.81078 18.3669C4.88786 18.2428 4.49287 18.0284 4.23223 17.7678C3.9716 17.5071 3.75715 17.1121 3.63307 16.1892C3.50319 15.2231 3.5 13.928 3.5 12C3.5 10.072 3.50319 8.77686 3.63307 7.81078C3.75715 6.88786 3.9716 6.49287 4.23223 6.23223C4.49287 5.9716 4.88786 5.75715 5.81078 5.63307C6.77686 5.50319 8.07198 5.5 10 5.5Z" fill="white" fill-opacity="0.8"/>
+                    <path d="M6.75 9.25H12.25" stroke="white" stroke-opacity="0.8" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+            </span>
+            <h4>{{ $t('Wallets') }}</h4>
+        </Link>
+
+        <div @click.prevent="showProfile" class="mobbar__link" :class="{'active': profileVisible}">
+            <span class="mobbar__icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M22.25 12C22.25 6.33908 17.6609 1.75 12 1.75C6.33908 1.75 1.75 6.33908 1.75 12C1.75 17.6609 6.33908 22.25 12 22.25C17.6609 22.25 22.25 17.6609 22.25 12Z" stroke="white" stroke-opacity="0.8" stroke-width="1.5"/>
+                    <path d="M11 8C11 8.55228 11.4477 9 12 9C12.5523 9 13 8.55228 13 8C13 7.44772 12.5523 7 12 7C11.4477 7 11 7.44772 11 8Z" fill="white" fill-opacity="0.8"/>
+                    <path d="M11 12C11 12.5523 11.4477 13 12 13C12.5523 13 13 12.5523 13 12C13 11.4477 12.5523 11 12 11C11.4477 11 11 11.4477 11 12Z" fill="white" fill-opacity="0.8"/>
+                    <path d="M11 16C11 16.5523 11.4477 17 12 17C12.5523 17 13 16.5523 13 16C13 15.4477 12.5523 15 12 15C11.4477 15 11 15.4477 11 16Z" fill="white" fill-opacity="0.8"/>
+                </svg>
+            </span>
+            <h4>More</h4>
+        </div>
+    </div>
+</div>

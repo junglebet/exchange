@@ -1,0 +1,33 @@
+<div class="tabs">
+    <div class="tabs-left">
+        <div class="tabs-nav">
+            <div v-if="!referrer" @click="setReport('admin.reports.wallets.system')" class="tabs-nav__item" :class="{'tabs-nav__active': section == 'system_wallets'}">
+                <h4>System Wallets</h4>
+            </div>
+            <div v-if="!referrer" @click="setReport('admin.reports.finances')" class="tabs-nav__item" :class="{'tabs-nav__active': section == 'finances'}">
+                <h4>Finances</h4>
+            </div>
+            <div @click="setReport('admin.reports.wallets')" class="tabs-nav__item" :class="{'tabs-nav__active': section == 'wallets'}">
+                <h4>User Wallets</h4>
+            </div>
+            <div @click="setReport('admin.reports.deposits')" class="tabs-nav__item" :class="{'tabs-nav__active': section == 'deposits'}">
+                <h4>Crypto Deposits</h4>
+            </div>
+            <div @click="setReport('admin.reports.withdrawals')" class="tabs-nav__item" :class="{'tabs-nav__active': section == 'withdrawals'}">
+                <h4>Crypto Withdrawals</h4>
+            </div>
+            <div @click="setReport('admin.reports.deposits.fiat')" class="tabs-nav__item" :class="{'tabs-nav__active': section == 'fiat_deposits'}">
+                <h4>Fiat Deposits</h4>
+            </div>
+            <div @click="setReport('admin.reports.withdrawals.fiat')" class="tabs-nav__item" :class="{'tabs-nav__active': section == 'fiat_withdrawals'}">
+                <h4>Fiat Withdrawals</h4>
+            </div>
+            <div @click="setReport('admin.reports.trades')" class="tabs-nav__item" :class="{'tabs-nav__active': section == 'trades'}">
+                <h4>Trades</h4>
+            </div>
+            <div @click="setReport('admin.reports.referral-transactions')" class="tabs-nav__item" :class="{'tabs-nav__active': section == 'referrals'}">
+                <h4>Referrals</h4>
+            </div>
+        </div>
+    </div>
+</div>

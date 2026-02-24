@@ -1,0 +1,51 @@
+<div class="site-layout wrapper flex flex-col min-h-screen">
+
+    <!-- thead start -->
+    <header class="header-section header z-10 noselect">
+        <div class="header__row">
+                <!-- header row left start -->
+                <div class="header__row-left">
+                    <!-- header logo start -->
+                    <div class="header-logo">
+                        <img class="main-logo" v-if="logo" :src="logo" />
+                        <img class="main-logo" v-else :src="route('home') + '/images/logo.png'" />
+                    </div>
+                </div>
+                <!-- header row left end -->
+        </div>
+    </header>
+    <!-- thead end -->
+
+    <!-- MAIN START -->
+    <main class="main-section main flex-grow">
+
+        <div class="main__container">
+            <div :class="{'max-w-screen-2xl mx-auto': !isHomePage, 'mobile-body': isMobile}">
+                <slot></slot>
+            </div>
+        </div>
+
+        <!-- Modal Portal -->
+        <portal-target name="modal" multiple></portal-target>
+    </main>
+    <!-- MAIN END -->
+
+    <!-- section footer start -->
+    <footer class="noselect section-footer">
+        <div class="section-footer__row">
+
+            <!-- copyright start -->
+            <div class="copyright">
+                <div class="copyright-left">
+                    <p>{{ $page.props.siteName }} {{ $t('© 2024') }}</p>
+                </div>
+            </div>
+            <!-- copyright end -->
+
+        </div>
+    </footer>
+    <!-- tfood end -->
+</div>
+
+
+

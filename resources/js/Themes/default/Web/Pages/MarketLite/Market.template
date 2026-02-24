@@ -1,0 +1,50 @@
+<app-layout>
+    <Head>
+        <meta name="description" content="">
+        <title>{{ market.data.name }} Market</title>
+    </Head>
+    <div class="trade marker-inner">
+
+        <!-- trade head start -->
+        <div class="trade-head">
+
+            <div class="trade-head__row-left">
+                <div class="trade-head__block-top">
+                    <market-stats :futures="futures" :quotes="quotes" :market="market.data"></market-stats>
+                </div>
+                <!-- module head start -->
+                <div class="module-head">
+                    <div class="pl-3 module-orderopen__navigation">
+                        <div @click="setFirstTab('orderbook')" :class="{'module-orderopen__navigation-active': mobileFirstTab == 'orderbook'}" class="module-orderopen__navigation-title"><h4>{{ $t('Orderbook') }}</h4></div>
+                        <div @click="setFirstTab('chart')" :class="{'module-orderopen__navigation-active': mobileFirstTab == 'chart'}" class="module-orderopen__navigation-title"><h4>{{ $t('Chart') }}</h4></div>
+                        <div @click="setFirstTab('orders')" :class="{'module-orderopen__navigation-active': mobileFirstTab == 'orders'}" class="module-orderopen__navigation-title"><h4>{{ $t('Orders') }}</h4></div>
+                        <div @click="setFirstTab('trades')" :class="{'module-orderopen__navigation-active': mobileFirstTab == 'trades'}" class="module-orderopen__navigation-title"><h4>{{ $t('Trades') }}</h4></div>
+
+                    </div>
+                </div>
+                <div class="trade-head__block-middle" v-if="mobileFirstTab == 'orderbook' || mobileFirstTab == 'chart' || mobileFirstTab == 'trades' || mobileFirstTab == 'orders'">
+                    <div class="trade-head__left" v-if="market && mobileFirstTab == 'orderbook'" >
+                        <order-book :market="market.data"></order-book>
+                    </div>
+                    <div class="trade-head__right" v-if="mobileFirstTab == 'chart'">
+                        <iframe scrolling="no"  :key="chartIteration" id="market-chart" :src="chartUrl" width="100%" height="250"></iframe>
+                    </div>
+                    <market-trades v-if="mobileFirstTab == 'trades'" :market="market.data"></market-trades>
+
+                    <div v-if="mobileFirstTab == 'orders'" class="trade-body__row mob-order-open">
+                        <open-orders :futures="futures" :market="market.data"></open-orders>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="trade-head__row-right">
+                <order-form active-tab="buy" :market="market.data" order-type="limit"></order-form>
+            </div>
+
+        </div>
+        <!-- trade head  end -->
+
+        <orderbook-channel :market="market.data"></orderbook-channel>
+    </div>
+</app-layout>

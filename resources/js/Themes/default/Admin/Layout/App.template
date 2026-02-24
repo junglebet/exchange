@@ -1,0 +1,123 @@
+<div class="admin-layout md:flex md:flex-col text-gray-700">
+    <!-- Hamburger -->
+    <div class="-mr-2 flex items-center admin-sidebar-nav sm:hidden text-right">
+        <button @click="showingNavigationDropdown = ! showingNavigationDropdown" class="mr-5 inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 focus:text-gray-500 transition duration-150 ease-in-out">
+            <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
+                <path :class="{'hidden': showingNavigationDropdown, 'inline-flex': ! showingNavigationDropdown }" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                <path :class="{'hidden': ! showingNavigationDropdown, 'inline-flex': showingNavigationDropdown }" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </button>
+    </div>
+    <div class="md:h-screen md:flex md:flex-col">
+        <div class="md:flex md:flex-grow md:overflow-hidden">
+            <div :class="{'admin-sidebar-active': showingNavigationDropdown}" class="admin-sidebar hidden md:block bg-gray-800 flex-shrink-0 w-56 overflow-y-auto">
+                <div class="flex items-center justify-center mt-10">
+                    <Link :href="route('home')">
+                        <img class="main-logo" v-if="logo" :src="logo" />
+                        <img class="main-logo" v-else :src="route('home') + '/images/logo.png'" />
+                    </Link>
+                </div>
+                <nav class="admin-dashboard-nav mt-10">
+                    <nav-link :href="route('admin.dashboard')" :active="isUrl('dashboard') ? true : false">
+                        <span class="flex items-center">
+                            <font-awesome-icon icon="tachometer-alt" />
+                            <span class="mx-4 font-medium">Dashboard</span>
+                        </span>
+                    </nav-link>
+                    <nav-link v-if="$page.props.user.roles.includes('assets_editor')" :href="route('admin.markets')" :active="isUrl('markets') ? true : false">
+                        <span class="flex items-center">
+                            <font-awesome-icon icon="exchange-alt" />
+                            <span class="mx-4 font-medium">Markets</span>
+                        </span>
+                    </nav-link>
+                    <nav-link v-if="$page.props.user.roles.includes('assets_editor')" :href="route('admin.currencies')" :active="isUrl('currencies') ? true : false">
+                        <span class="flex items-center">
+                            <font-awesome-icon icon="coins" />
+                            <span class="mx-4 font-medium">Currencies</span>
+                        </span>
+                    </nav-link>
+                    <nav-link v-if="$page.props.user.roles.includes('assets_editor')" :href="route('admin.networks')" :active="isUrl('networks') ? true : false">
+                        <span class="flex items-center">
+                            <font-awesome-icon icon="layer-group" />
+                            <span class="mx-4 font-medium">Networks</span>
+                        </span>
+                    </nav-link>
+                    <nav-link v-if="$page.props.user.roles.includes('user_editor')" :href="route('admin.users')" :active="isUrl('users') ? true : false">
+                        <span class="flex items-center">
+                            <font-awesome-icon icon="user" />
+                            <span class="mx-4 font-medium">Users</span>
+                        </span>
+                    </nav-link>
+
+                    <nav-link v-if="$page.props.user.roles.includes('user_editor')" :href="route('admin.kyc.documents')" :active="isUrl('kyc-documents') ? true : false">
+                        <span class="flex items-center">
+                            <font-awesome-icon icon="passport" />
+                            <span class="mx-4 font-medium">KYC</span>
+                        </span>
+                    </nav-link>
+
+                    <nav-link v-if="$page.props.user.roles.includes('content_editor')" :href="route('admin.pages')" :active="isUrl('pages') ? true : false">
+                        <span class="flex items-center">
+                            <font-awesome-icon icon="file" />
+                            <span class="mx-4 font-medium">Pages</span>
+                        </span>
+                    </nav-link>
+
+                    <nav-link v-if="$page.props.user.roles.includes('content_editor')" :href="route('admin.articles')" :active="isUrl('articles') ? true : false">
+                        <span class="flex items-center">
+                            <font-awesome-icon icon="newspaper" />
+                            <span class="mx-4 font-medium">Articles</span>
+                        </span>
+                    </nav-link>
+
+                    <nav-link v-if="$page.props.user.roles.includes('content_editor')" :href="route('admin.languages')" :active="isUrl('languages') ? true : false">
+                        <span class="flex items-center">
+                            <font-awesome-icon icon="globe" />
+                            <span class="mx-4 font-medium">Languages</span>
+                        </span>
+                    </nav-link>
+
+                    <nav-link v-if="$page.props.user.roles.includes('superadmin')" :href="route('admin.launchpads')" :active="isUrl('launchpads') ? true : false">
+                        <span class="flex items-center">
+                            <font-awesome-icon icon="flag" />
+                            <span class="mx-4 font-medium">Launchpads</span>
+                        </span>
+                    </nav-link>
+
+                    <nav-link v-if="$page.props.user.roles.includes('finance_manager')" :href="route('admin.reports')" :active="isUrl('reports') ? true : false">
+                        <span class="flex items-center">
+                            <font-awesome-icon icon="clipboard-list" />
+                            <span class="mx-4 font-medium">Reports</span>
+                        </span>
+                    </nav-link>
+                    <nav-link v-if="$page.props.user.roles.includes('superadmin')" :href="route('admin.vouchers')" :active="isUrl('vouchers') ? true : false">
+                        <span class="flex items-center">
+                            <font-awesome-icon icon="gift" />
+                            <span class="mx-4 font-medium">Vouchers</span>
+                        </span>
+                    </nav-link>
+                    <nav-link v-if="$page.props.user.roles.includes('superadmin')" :href="route('admin.settings')" :active="isUrl('settings') ? true : false">
+                        <span class="flex items-center">
+                            <font-awesome-icon icon="wrench" />
+                            <span class="mx-4 font-medium">Settings</span>
+                        </span>
+                    </nav-link>
+                    <Link as="button" :href="route('logout')" method="post" class="w-full flex justify-between items-center py-3 px-6 text-gray-400 cursor-pointer hover:bg-gray-700 hover:text-gray-100 focus:outline-none">
+                        <span class="flex items-center">
+                            <font-awesome-icon icon="sign-out-alt" />
+                            <span class="mx-4 font-medium">Logout</span>
+                        </span>
+                    </Link>
+                </nav>
+            </div>
+            <div scroll-region="" class="md:flex-1 px-4 py-8 md:p-12 md:overflow-y-auto bg-gray-100">
+                <div>
+                    <slot></slot>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal Portal -->
+    <portal-target name="modal" multiple></portal-target>
+    <socket />
+</div>

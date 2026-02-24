@@ -1,0 +1,260 @@
+<app-layout>
+    <h1 class="mb-8 font-bold text-3xl">
+        <Link class="text-indigo-400 hover:text-indigo-600" :href="route('admin.currencies')">Currencies</Link>
+        - {{ subTitle }}
+    </h1>
+    <trashed-message v-if="isEdit && currency.deleted_at" class="mb-6" @restore="restore">
+        This currency has been deleted.
+    </trashed-message>
+    <div class="bg-white rounded shadow overflow-hidden lg:w-1/2">
+        <form @submit.prevent="submit">
+            <div class="p-8 -mr-6 -mb-8 flex flex-wrap">
+
+                <div class="pr-6 pb-8 w-full">
+                    <div class="font-weight-bold text-xl border-b mb-2 pb-4 font-medium">General Information</div>
+                </div>
+
+                <text-input v-model="form.name" :error="errors.name" class="pr-6 pb-8 w-full lg:w-1/2" label="Name" />
+
+                <text-input v-if="!form.networks.includes(3) && !form.networks.includes(6) && !form.networks.includes(8)" v-model="form.symbol" :error="errors.symbol" class="pr-6 pb-8 w-full lg:w-1/2" label="Symbol" />
+
+                <div class="pr-6 pb-8 w-full">
+                    <div class="font-weight-bold text-xl border-b mt-5 mb-2 pb-4 font-medium">Currency Status</div>
+                </div>
+
+                <div class="pr-6 pb-8 w-full lg:w-1/2">
+                    <label class="form-label block mr-2 mb-3">Currency Visibility</label>
+                    <t-toggle v-model="form.status" />
+                    <div class="text-red-600 mb-3" v-if="errors.status">
+                        {{ errors.status }}
+                    </div>
+                </div>
+
+                <div class="pr-6 pb-8 w-full lg:w-1/2">
+                    <label class="form-label block mr-2 mb-3">Deposits Allowed</label>
+                    <t-toggle v-model="form.deposit_status" />
+                    <div class="text-red-600 mb-3" v-if="errors.deposit_status">
+                        {{ errors.deposit_status }}
+                    </div>
+                </div>
+
+                <div class="pr-6 pb-8 w-full lg:w-1/2">
+                    <label class="form-label block mr-2 mb-3">Withdrawals Allowed</label>
+                    <t-toggle v-model="form.withdraw_status" />
+                    <div class="text-red-600 mb-3" v-if="errors.withdraw_status">
+                        {{ errors.withdraw_status }}
+                    </div>
+                </div>
+
+                <div class="pr-6 pb-8 w-full">
+                    <div class="font-weight-bold text-xl border-b mt-5 mb-2 pb-4 font-medium">Networks</div>
+                    <div>
+                    <empty-column></empty-column>
+
+                        <select-input v-model="form.type" :error="errors.type" class="pr-6 pb-8 w-full lg:w-1/2" label="Type">
+                            <option value="coin">Coin</option>
+                            <option value="fiat">Fiat</option>
+                        </select-input>
+
+                        <div class="text-red-600 mb-3" v-if="errors.networks">
+                            {{ errors.networks }}
+                        </div>
+
+                        <div v-for="network in networks" v-if="form.type == network.type" class="pr-6 pb-2 w-full lg:w-1/2">
+                            <label @click="setNetwork(network)"  class="form-label mr-2 d-inline-block">{{ network.name }}</label>
+                            <t-checkbox name="networks" v-model="form.networks" :value="network.id" />
+                        </div>
+
+                        <div class="bg-gray-200 mt-5 p-5 rounded" v-if="form.networks.includes(1) || form.networks.includes(3) || form.networks.includes(6) || form.networks.includes(8) || form.networks.includes(16)">
+                            <div v-if="form.networks.includes(1)" class="">Coinpayments Currency</div>
+                            <t-rich-select v-if="form.networks.includes(1)"
+                                       :options="coinpaymentCoins"
+                                       v-model="coinpaymentSelected"
+                                       placeholder="Attach coin to this currency"
+                                       value-attribute="symbol"
+                                       text-attribute="name"
+                                       class="pr-6 pb-8 w-full"
+                            >
+                                <template
+                                    slot="label"
+                                    slot-scope="{ className, option, query }"
+                                >
+                                    <div class="flex">
+                                        <div class="flex flex-col">
+                                            <span>{{ option.value }} - {{ option.text }}</span>
+                                        </div>
+                                    </div>
+                                </template>
+                                <template
+                                    slot="option"
+                                    slot-scope="{ index, isHighlighted, isSelected, className, option, query }"
+                                >
+                                    <div :class="className">
+                                        <div class="flex flex-col w-full ml-2 text-gray-800">
+                                            <span class="text-sm leading-tight text-gray-700"><strong>{{ option.value }}</strong>
+                                                - {{ option.text }}</span>
+                                        </div>
+                                    </div>
+                                </template>
+                            </t-rich-select>
+                            <div v-if="errors.alt_symbol" class="form-error text-red-400">{{ errors.alt_symbol }}</div>
+
+                            <text-input v-if="form.networks.includes(1)" v-model="form.coinpayments_description" :error="errors.coinpayments_description" class="pr-6 pb-10 w-full" label="Coinpayments Network Name" />
+
+                            <div v-if="form.networks.includes(3) || form.networks.includes(6) || form.networks.includes(8) || form.networks.includes(8) || form.networks.includes(16)" class="mb-5 text-red-500"> IMPORTANT: Fill the SYMBOL, CONTRACT fields carefully. Any mistake would cause deposit, withdrawal, and currency amount issues.</div>
+
+                            <text-input v-if="form.networks.includes(3)" v-model="form.contract" :error="errors.contract" class="pr-6 pb-4 w-full" label="ERC-20 Contract" />
+                            <text-input v-if="form.networks.includes(6)" v-model="form.bep_contract" :error="errors.bep_contract" class="pr-6 pb-4 w-full" label="BEP-20 Contract" />
+                            <text-input v-if="form.networks.includes(8)" v-model="form.trc_contract" :error="errors.trc_contract" class="pr-6 pb-4 w-full" label="TRC-20 Contract" />
+                            <text-input v-if="form.networks.includes(16)" v-model="form.matic_contract" :error="errors.matic_contract" class="pr-6 pb-4 w-full" label="MATIC-20 Contract" />
+
+                            <text-input v-model="form.decimals" :error="errors.decimals" class="pr-6 pb-4 w-full" label="Decimals" />
+
+                            <text-input v-if="form.networks.includes(3) || form.networks.includes(6) || form.networks.includes(8) || form.networks.includes(16)" v-model="form.symbol" :error="errors.symbol" class="pr-6 pb-4 w-full" label="Symbol" />
+
+                        </div>
+                    </div>
+                    <div class="border mt-5 p-5 rounded" v-if="form.networks.includes(4)">
+
+                        <text-input v-model="form.decimals" :error="errors.decimals" class="mb-5 pr-6 pb-4 w-full lg:w-1/2" label="Decimals" />
+
+                        <div class="pr-6 pb-8 w-full lg:w-1/2">
+                            <label class="form-label block mr-2 mb-3">Enable Bank Transfers</label>
+                            <t-toggle v-model="form.bank_status" />
+                            <div v-if="errors.bank_status" class="form-error text-red-400">{{ errors.bank_status }}</div>
+                        </div>
+
+                        <select-input v-if="form.bank_status" v-model="form.bank_account" :error="errors.bank_account" class="pr-6 pb-8 w-full lg:w-1/2" label="Bank Accounts">
+                            <option v-for="account in bankAccounts" :value="account.id">{{ account.name }}</option>
+                        </select-input>
+
+                        <div class="pr-6 pb-8 w-full lg:w-1/2">
+                            <label class="form-label block mr-2 mb-3">Enable Credit Card Payments</label>
+                            <t-toggle v-model="form.cc_status" />
+                            <div v-if="errors.cc_status" class="form-error text-red-400">{{ errors.cc_status }}</div>
+                        </div>
+
+                        <text-input v-if="form.cc_status" v-model="form.cc_exchange_rate" :error="errors.cc_exchange_rate" class="pr-6 pb-4 w-full" label="Exchange Rate" />
+                        <small v-if="form.cc_status"><i>The Exchange Rate is used to get a conversion rate against USD. Set value to <strong>1</strong> if it is USD, which means <strong>1:1 ratio</strong> (e.g for EUR set <strong>1.17</strong>, which means 1:1.17 ratio). This conversion rate is required, so you can charge users in USD (US Dollar) amount using Stripe API.</i></small>
+                    </div>
+
+                </div>
+
+                <div class="pr-6 pb-8 w-full">
+                    <div class="font-weight-bold text-xl border-b mb-2 pb-4 font-medium">Deposit & Withdrawal Rules</div>
+                </div>
+
+                <text-input v-model="form.min_deposit" :error="errors.min_deposit" class="pr-6 pb-8 w-full lg:w-1/2" label="Minimum Deposit Amount" />
+
+                <text-input v-if="form.networks.includes(4) || form.networks.includes(12)" v-model="form.max_deposit" :error="errors.max_deposit" class="pr-6 pb-8 w-full lg:w-1/2" label="Maximum Deposit Amount" />
+
+                <text-input v-model="form.min_withdraw" :error="errors.min_withdraw" class="pr-6 pb-8 w-full lg:w-1/2" label="Minimum Withdraw Amount" />
+
+                <text-input v-model="form.max_withdraw" :error="errors.max_withdraw" class="pr-6 pb-8 w-full lg:w-1/2" label="Maximum Withdraw Amount" />
+
+                <text-input v-if="!form.networks.includes(4)" v-model="form.min_deposit_confirmation" :error="errors.min_deposit_confirmation" class="pr-6 pb-8 w-full lg:w-1/2" label="Deposit Network Confirmation" />
+
+                <div class="pr-6 pb-8 w-full">
+                    <div class="font-weight-bold text-xl border-b mb-2 pb-4 font-medium">Deposit Fees</div>
+
+                    <p>If fee set in floating (%) form, fixed fee will be ignored.</p>
+                    <p>If floating (%) fee is 0, fixed fee will be used.</p>
+                </div>
+
+                <text-input v-if="!form.networks.includes(3) && !form.networks.includes(6) && !form.networks.includes(8) && !form.networks.includes(16)" v-model="form.deposit_fee" :error="errors.deposit_fee" class="pr-6 pb-8 w-full lg:w-1/2" label="Deposit Fee General (%)" />
+                <text-input v-if="!form.networks.includes(3) && !form.networks.includes(6) && !form.networks.includes(8) && !form.networks.includes(16)" v-model="form.deposit_fee_fixed" :error="errors.deposit_fee_fixed" class="pr-6 pb-8 w-full lg:w-1/2" label="Deposit Fee General Fixed" />
+
+                <text-input v-if="form.networks.includes(3)" v-model="form.deposit_fee_erc" :error="errors.deposit_fee_erc" class="pr-6 pb-8 w-full lg:w-1/2" label="Deposit Fee ERC20 (%)" />
+                <text-input v-if="form.networks.includes(3)" v-model="form.deposit_fee_erc_fixed" :error="errors.deposit_fee_erc_fixed" class="pr-6 pb-8 w-full lg:w-1/2" label="Deposit Fee ERC20 Fixed" />
+
+                <text-input v-if="form.networks.includes(6)" v-model="form.deposit_fee_bep" :error="errors.deposit_fee_bep" class="pr-6 pb-8 w-full lg:w-1/2" label="Deposit Fee BEP20 (%)" />
+                <text-input v-if="form.networks.includes(6)" v-model="form.deposit_fee_bep_fixed" :error="errors.deposit_fee_bep_fixed" class="pr-6 pb-8 w-full lg:w-1/2" label="Deposit Fee BEP20 Fixed" />
+
+                <text-input v-if="form.networks.includes(8)" v-model="form.deposit_fee_trc" :error="errors.deposit_fee_trc" class="pr-6 pb-8 w-full lg:w-1/2" label="Deposit Fee TRC20 (%)" />
+                <text-input v-if="form.networks.includes(8)" v-model="form.deposit_fee_trc_fixed" :error="errors.deposit_fee_trc_fixed" class="pr-6 pb-8 w-full lg:w-1/2" label="Deposit Fee TRC20 Fixed" />
+
+                <text-input v-if="form.networks.includes(16)" v-model="form.deposit_fee_matic" :error="errors.deposit_fee_matic" class="pr-6 pb-8 w-full lg:w-1/2" label="Deposit Fee MATIC20 (%)" />
+                <text-input v-if="form.networks.includes(16)" v-model="form.deposit_fee_matic_fixed" :error="errors.deposit_fee_matic_fixed" class="pr-6 pb-8 w-full lg:w-1/2" label="Deposit Fee MATIC20 Fixed" />
+
+                <div class="pr-6 pb-8 w-full">
+                    <div class="font-weight-bold text-xl border-b mb-2 pb-4 font-medium">Withdrawal Fees</div>
+
+                    <p>If fee set in floating (%) form, fixed fee will be ignored.</p>
+                    <p>If floating (%) fee is 0, fixed fee will be used.</p>
+                </div>
+                <text-input v-model="form.withdraw_fee" :error="errors.withdraw_fee" class="pr-6 pb-8 w-full lg:w-1/2" label="Withdraw Fee General (%)" />
+                <text-input v-model="form.withdraw_fee_fixed" :error="errors.withdraw_fee" class="pr-6 pb-8 w-full lg:w-1/2" label="Withdraw Fee Fixed" />
+
+                <text-input v-if="form.networks.includes(3)" v-model="form.withdraw_fee_erc" :error="errors.withdraw_fee_erc" class="pr-6 pb-8 w-full lg:w-1/2" label="Withdraw Fee ERC20 (%)" />
+                <text-input v-if="form.networks.includes(3)" v-model="form.withdraw_fee_erc_fixed" :error="errors.withdraw_fee_erc_fixed" class="pr-6 pb-8 w-full lg:w-1/2" label="Withdraw Fee ERC20 Fixed" />
+
+                <text-input v-if="form.networks.includes(6)" v-model="form.withdraw_fee_bep" :error="errors.withdraw_fee_bep" class="pr-6 pb-8 w-full lg:w-1/2" label="Withdraw Fee BEP20 (%)" />
+                <text-input v-if="form.networks.includes(6)" v-model="form.withdraw_fee_bep_fixed" :error="errors.withdraw_fee_bep_fixed" class="pr-6 pb-8 w-full lg:w-1/2" label="Withdraw Fee BEP20 Fixed" />
+
+                <text-input v-if="form.networks.includes(8)" v-model="form.withdraw_fee_trc" :error="errors.withdraw_fee_trc" class="pr-6 pb-8 w-full lg:w-1/2" label="Withdraw Fee TRC20 (%)" />
+                <text-input v-if="form.networks.includes(8)" v-model="form.withdraw_fee_trc_fixed" :error="errors.withdraw_fee_trc_fixed" class="pr-6 pb-8 w-full lg:w-1/2" label="Withdraw Fee TRC20 Fixed" />
+
+                <text-input v-if="form.networks.includes(16)" v-model="form.withdraw_fee_matic" :error="errors.withdraw_fee_matic" class="pr-6 pb-8 w-full lg:w-1/2" label="Withdraw Fee MATIC20 (%)" />
+                <text-input v-if="form.networks.includes(16)" v-model="form.withdraw_fee_matic_fixed" :error="errors.withdraw_fee_matic_fixed" class="pr-6 pb-8 w-full lg:w-1/2" label="Withdraw Fee MATIC20 Fixed" />
+
+                <div class="pr-6 pb-8 w-full">
+                    <div class="font-weight-bold text-xl border-b mb-2 pb-4 font-medium">Currency Logo</div>
+                </div>
+
+                <div id="file-uploader-form">
+                    <strong class="text-sm">We highly recommend to use the following image properties:</strong><br>
+                    <div class="d-block mb-5 mt-5 text-sm">
+                        Width: 40px<br>
+                        Height: 40px<br>
+                        Background: Transparent<br>
+                        Type: Rounded
+                    </div>
+
+                    <VueFileAgent
+                        class="profile-pic-upload-block"
+                        ref="fileUploadForm"
+                        :multiple="false"
+                        :deletable="false"
+                        :meta="false"
+                        :compact="true"
+                        :accept="'image/*'"
+                        :helpText="'Drag an image file here'"
+                        :errorText="{
+                              type: 'Please select an image',
+                            }"
+                        v-model="currencyLogo"
+                        @select="onSelect($event)"
+                        @upload="onUpload($event)"
+                    >
+                        <template v-slot:before-outer>
+                        </template >
+                        <template v-slot:after-outer>
+                            <div title="after-outer">
+                                <div class="mb-4">
+                                    <small>Allowed types: <strong>jpg, png.</strong></small>
+                                    <small>Max filesize: <strong>1MB</strong></small>
+                                </div>
+                                <div class="drop-help-text">
+                                    <p class="text-success">Drop the file!</p>
+                                </div>
+                                <button type="button" class="flex justify-between items-center py-2 border-radius-xl px-4 bg-red-500 text-sm rounded text-gray-100 cursor-pointer hover:bg-red-600 hover:text-gray-100 focus:outline-none" :class="[uploaded ? 'btn-danger' : 'btn-secondary']" v-if="currencyLogo" @click="removePic()">Remove</button>
+                                <div class="clearfix"></div>
+                            </div>
+                        </template >
+                    </VueFileAgent>
+                    <div v-if="errors.file_id" class="form-error text-red-400">{{ errors.file_id }}</div>
+                </div>
+            </div>
+            <div class="px-8 py-4 bg-gray-100 border-t border-gray-200 flex items-center mt-10">
+                <button v-if="isEdit && !currency.deleted_at" class="focus:outline-none text-red-600 hover:underline" tabindex="-1" type="button" @click="destroy">Delete Currency</button>
+                <loading-button :loading="sending" class="btn-indigo ml-auto" type="submit">
+                    <svg v-show="sending" class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    {{ actionButtonTitle }}
+                </loading-button>
+            </div>
+        </form>
+    </div>
+</app-layout>

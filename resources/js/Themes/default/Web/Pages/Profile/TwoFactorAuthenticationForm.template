@@ -1,0 +1,75 @@
+<jet-action-section>
+    <div class="form-container two-factor">
+        <!-- form components start -->
+        <div class="form-components">
+
+            <div class="form-components__title"><h3>{{ $t('Two Factor Authentication') }}</h3></div>
+            <div class="form-components__body">
+                <div class="form-components__input-text">
+
+                    <div class="form-components__block">
+                        <div class="form-components__block-item block-text pb-5">
+                            <p>{{ $t('Add additional security to your account using two factor authentication.') }}</p>
+                        </div>
+
+                        <div class="form-components__block-item block-text pt-5 pb-5 ">
+                            <p class="text-green-500" v-if="twoFactorEnabled">{{ $t('You have enabled two factor authentication.') }}</p>
+                            <p class="text-red-500" v-else>{{ $t('You have not enabled two factor authentication.') }}</p>
+                        </div>
+
+                        <div v-if="!twoFactorEnabled" class="form-components__block-item block-text">
+                            <p>{{ $t("When two factor authentication is enabled, you will be prompted for a secure, random token during authentication. You may retrieve this token from your phone's Google Authenticator application.") }}</p>
+                        </div>
+                    </div>
+                    <div v-if="twoFactorEnabled" class="form-components__block">
+                        <div class="form-components__block-item block-text">
+                            <p>{{ $t("Two factor authentication is now enabled. Scan the following QR code using your phone's authenticator application.") }}</p>
+                        </div>
+                        <div v-if="qrCode" class="form-components__block-item block-qr mb-5">
+                            <div class="mt-4 dark:p-4 dark:w-56 dark:bg-white" v-html="qrCode">
+                            </div>
+                        </div>
+                        <div class="form-components__block-item block-text" v-if="recoveryCodes.length > 0">
+                            <p>{{ $t('Store these recovery codes in a secure password manager. They can be used to recover access to your account if your two factor authentication device is lost.') }}</p>
+                        </div>
+                    </div>
+                    <div v-if="twoFactorEnabled && recoveryCodes.length > 0" class="form-components__block">
+                        <div class="form-components__block-item block-keys">
+                            <ul>
+                                <li v-for="code in recoveryCodes" :key="code">
+                                    {{ code }}
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div v-if="twoFactorEnabled" class="form-components__block">
+                        <jet-confirms-password @confirmed="regenerateRecoveryCodes">
+                            <button v-if="recoveryCodes.length > 0" type="button" class="btn btn-white">{{ $t('Regenerate recovery codes') }}</button>
+                        </jet-confirms-password>
+
+                        <jet-confirms-password @confirmed="showRecoveryCodes">
+                            <button v-if="recoveryCodes.length === 0" type="button" class="btn btn-white">{{ $t('Show recovery codes') }}</button>
+                        </jet-confirms-password>
+
+
+                        <jet-confirms-password @confirmed="disableTwoFactorAuthentication">
+                            <button :class="{ 'opacity-75': disabling }" :disabled="disabling" type="button" class="btn btn-red ml-2">{{ $t('Disable') }}</button>
+                        </jet-confirms-password>
+
+                    </div>
+                    <div v-if="!twoFactorEnabled" class="form-components__block">
+                        <div class="form-components__block-item block-button">
+                            <jet-confirms-password @confirmed="enableTwoFactorAuthentication">
+                                <button class="form-components__block-button" :class="{ 'opacity-75': enabling }" :disabled="enabling">{{ $t('Enable') }}</button>
+                            </jet-confirms-password>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+        <!-- form components end -->
+    </div>
+</jet-action-section>

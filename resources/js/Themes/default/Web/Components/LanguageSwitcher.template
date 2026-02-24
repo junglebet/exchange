@@ -1,0 +1,5 @@
+<div class="component-language-switcher">
+    <a v-for="(slug, name) in $page.props.languages" @click.step.prevent="switchLanguage(slug)" :class="{'item-language__active': defaultLanguage == slug}" class="cursor-pointer item-language">
+        <div class="header-dropdown__list-title">{{ name }}</div>
+    </a>
+</div>

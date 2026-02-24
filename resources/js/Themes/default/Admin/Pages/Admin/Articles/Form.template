@@ -1,0 +1,156 @@
+<app-layout>
+    <h1 class="mb-8 font-bold text-3xl">
+        <Link class="text-indigo-400 hover:text-indigo-600" :href="route('admin.articles')">Articles</Link>
+        - {{ subTitle }}
+    </h1>
+    <trashed-message v-if="isEdit && article.deleted_at" class="mb-6" @restore="restore">
+        This article has been deleted.
+    </trashed-message>
+    <div class="bg-white rounded shadow overflow-hidden lg:w-1/2">
+        <form @submit.prevent="submit">
+            <div class="p-8 -mr-6 -mb-8 flex flex-wrap">
+
+                <div class="pr-6 pb-8 w-full">
+                    <div class="font-weight-bold text-xl border-b mb-2 pb-4 font-medium">General Information</div>
+                </div>
+
+                <text-input v-model="form.title" :error="errors.name" class="pr-6 pb-8 w-full" label="Title" />
+
+                <div class="pr-6 pb-8 w-full">
+                    <loading-button @click.native="generateSlug()" class="btn-indigo ml-auto" type="button">Generate slug</loading-button>
+                </div>
+
+                <text-input v-model="form.slug" :error="errors.slug" class="pr-6 pb-8 w-full" label="Slug" />
+
+                <div class="pr-6 pb-8 w-full lg:w-1/2">
+                    <label class="form-label d-block">Language:</label>
+                    <t-rich-select
+                        :options="languages"
+                        v-model="form.language"
+                        placeholder="Select language"
+                        value-attribute="slug"
+                        text-attribute="name"
+                    >
+                        <template
+                            slot="label"
+                            slot-scope="{ className, option, query }"
+                        >
+                            <div class="flex">
+                                <div class="flex flex-col">
+                                    <span>{{ option.text }}</span>
+                                </div>
+                            </div>
+                        </template>
+                    </t-rich-select>
+                    <div v-if="errors.language" class="form-error text-red-400">{{ errors.language }}</div>
+                </div>
+
+                <div class="pr-6 pb-8 w-full lg:w-1/2">
+                    <label class="form-label d-block">Category:</label>
+                    <t-rich-select
+                        :options="categories"
+                        v-model="form.category_id"
+                        placeholder="Select category"
+                        value-attribute="id"
+                        text-attribute="name"
+                    >
+                        <template
+                            slot="label"
+                            slot-scope="{ className, option, query }"
+                        >
+                            <div class="flex">
+                                <div class="flex flex-col">
+                                    <span>{{ option.text }}</span>
+                                </div>
+                            </div>
+                        </template>
+                    </t-rich-select>
+                    <div v-if="errors.category_id" class="form-error text-red-400">{{ errors.category_id }}</div>
+                </div>
+
+                <div class="pr-6 pb-8 w-full">
+
+                    <quill-editor
+                        v-model="form.body"
+                        height="250"
+                    />
+                    <div v-if="errors.body" class="form-error text-red-500">{{ errors.body }}</div>
+                </div>
+
+                <div class="pr-6 pb-8 w-full">
+                    <div class="font-weight-bold text-xl border-b mt-5 mb-2 pb-4 font-medium">Article Status</div>
+                </div>
+
+                <div class="pr-6 pb-8 w-full lg:w-1/2">
+                    <label class="form-label block mr-2 mb-3">Article Visibility</label>
+                    <t-toggle v-model="form.status" />
+                    <div class="text-red-600 mb-3" v-if="errors.status">
+                        {{ errors.status }}
+                    </div>
+
+                    <label class="form-label block mr-2 mb-3">Article Featured</label>
+                    <t-toggle v-model="form.featured" />
+                    <div class="text-red-600 mb-3" v-if="errors.featured">
+                        {{ errors.featured }}
+                    </div>
+                </div>
+
+                <div class="pr-6 pb-8 w-full">
+                    <div class="font-weight-bold text-xl border-b mb-2 pb-4 font-medium">Article Image</div>
+                </div>
+
+                <div id="file-uploader-form">
+                    <strong class="text-sm">We highly recommend to use the following image properties:</strong><br>
+                    <div class="d-block mb-5 mt-5 text-sm">
+                        Width: 400px<br>
+                        Height: 175px<br>
+                    </div>
+
+                    <VueFileAgent
+                        class="profile-pic-upload-block"
+                        ref="fileUploadForm"
+                        :multiple="false"
+                        :deletable="false"
+                        :meta="false"
+                        :compact="true"
+                        :accept="'image/*'"
+                        :helpText="'Drag an image file here'"
+                        :errorText="{
+                              type: 'Please select an image',
+                            }"
+                        v-model="articleLogo"
+                        @select="onSelect($event)"
+                        @upload="onUpload($event)"
+                    >
+                        <template v-slot:before-outer>
+                        </template >
+                        <template v-slot:after-outer>
+                            <div title="after-outer">
+                                <div class="mb-4">
+                                    <small>Allowed types: <strong>jpg, png.</strong></small>
+                                    <small>Max filesize: <strong>1MB</strong></small>
+                                </div>
+                                <div class="drop-help-text">
+                                    <p class="text-success">Drop the file!</p>
+                                </div>
+                                <button type="button" class="flex justify-between items-center py-2 border-radius-xl px-4 bg-red-500 text-sm rounded text-gray-100 cursor-pointer hover:bg-red-600 hover:text-gray-100 focus:outline-none" :class="[uploaded ? 'btn-danger' : 'btn-secondary']" v-if="articleLogo" @click="removePic()">Remove</button>
+                                <div class="clearfix"></div>
+                            </div>
+                        </template >
+                    </VueFileAgent>
+                    <div v-if="errors.file_id" class="form-error text-red-400">{{ errors.file_id }}</div>
+                </div>
+            </div>
+            <div class="px-8 py-4 bg-gray-100 border-t border-gray-200 flex items-center mt-10">
+                <button v-if="isEdit && !article.deleted_at" class="focus:outline-none text-red-600 hover:underline" tabindex="-1" type="button" @click="destroy">Delete Article</button>
+                <loading-button :loading="sending" class="btn-indigo ml-auto" type="submit">
+                    <svg v-show="sending" class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    {{ actionButtonTitle }}
+                </loading-button>
+            </div>
+        </form>
+    </div>
+</app-layout>

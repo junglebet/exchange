@@ -1,0 +1,75 @@
+<app-layout>
+    <Head>
+        <title>{{ $t('My Dashboard')}}</title>
+        <meta name="description" content="">
+    </Head>
+
+    <div class="components-title"><h2>User Dashboard</h2></div>
+
+    <!-- tab component nav start -->
+    <div class="tabs-components tabs">
+
+        <!-- tabs left start -->
+        <div class="tabs-left mob-hide">
+            <div class="tabs-nav">
+                <div @click="setPage('info')" class="tabs-nav__item" :class="{'tabs-nav__active' : page == 'info'}"><h4>{{ $t('Profile') }}</h4></div>
+                <div @click="setPage('user.kyc', true)" class="tabs-nav__item" :class="{'tabs-nav__active' : page == 'kyc'}"><h4>{{ $t('KYC') }}</h4></div>
+                <div @click="setPage('vouchers')" class="tabs-nav__item" :class="{'tabs-nav__active' : page == 'vouchers'}"><h4>{{ $t('Vouchers') }}</h4></div>
+                <div @click="setPage('bank_accounts')" class="tabs-nav__item" :class="{'tabs-nav__active' : page == 'bank_accounts'}"><h4>{{ $t('Bank Accounts') }}</h4></div>
+                <div @click="setPage('email')" class="tabs-nav__item" :class="{'tabs-nav__active' : page == 'email'}"><h4>{{ $t('Email Change') }}</h4></div>
+                <div @click="setPage('password')" class="tabs-nav__item" :class="{'tabs-nav__active' : page == 'password'}"><h4>{{ $t('Password Change') }}</h4></div>
+                <div @click="setPage('2fa')" class="tabs-nav__item" :class="{'tabs-nav__active' : page == '2fa'}"><h4>{{ $t('Two Factor Authentication') }}</h4></div>
+                <div @click="setPage('browser_sessions')" class="tabs-nav__item" :class="{'tabs-nav__active' : page == 'browser_sessions'}"><h4>{{ $t('Browser Sessions') }}</h4></div>
+                <Link as="div" :href="route('api-tokens.index')" class="tabs-nav__item">{{ $t('Api Tokens') }}</Link>
+                <div @click="setPage('account_delete')" class="tabs-nav__item" :class="{'tabs-nav__active' : page == 'account_delete'}" ><h4>{{ $t('Delete Account') }}</h4></div>
+            </div>
+        </div>
+        <!-- tabs left end -->
+
+        <div class="form-search__result-block mob-show">
+            <div class="form-search__result-title">Select section</div>
+            <div class="form-search__result-link">
+                <select v-model="tabPage" @change="setTabPage" class="network-select">
+                    <option value="info">{{ $t('Profile') }}</option>
+                    <option value="kyc">{{ $t('KYC') }}</option>
+                    <option value="vouchers">{{ $t('Vouchers') }}</option>
+                    <option value="bank_accounts">{{ $t('Bank') }}</option>
+                    <option value="email">{{ $t('Email Change') }}</option>
+                    <option value="password">{{ $t('Password Change') }}</option>
+                    <option value="2fa">{{ $t('Two Factor Authentication') }}</option>
+                    <option value="browser_sessions">{{ $t('Browser Sessions') }}</option>
+                    <option value="api_token">{{ $t('Api Tokens') }}</option>
+                    <option value="account_delete">{{ $t('Delete Account') }}</option>
+                </select>
+            </div>
+        </div>
+
+    </div>
+    <!-- tab component nav end -->
+    <div class="profile-inner-page">
+        <template v-if="page == 'email'">
+            <update-profile-information-form :user="$page.props.user" />
+        </template>
+        <template v-else-if="page == 'vouchers'">
+            <vouchers />
+        </template>
+        <template v-else-if="page == 'bank_accounts'">
+            <bank-accounts />
+        </template>
+        <template v-else-if="page == 'password'">
+            <update-password-form />
+        </template>
+        <template v-else-if="page == '2fa'">
+            <two-factor-authentication-form />
+        </template>
+        <template v-else-if="page == 'browser_sessions'">
+            <logout-other-browser-sessions-form :sessions="sessions"/>
+        </template>
+        <template v-else-if="page == 'account_delete'">
+            <delete-user-form class=" sm:mt-0" />
+        </template>
+        <template v-else>
+            <profile-information :user="$page.props.user" />
+        </template>
+    </div>
+</app-layout>

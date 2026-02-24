@@ -1,0 +1,208 @@
+
+
+
+
+
+.launchpad-inner {
+    font-size: 0.80rem;
+    max-width: 700px;
+    width: 100%;
+    // padding: 1rem;
+    // border: 1px solid rgba(40, 40, 75, 0.6);
+    // border-radius: 6px;
+
+    div.flex {
+        display: block !important;
+
+        span {
+            font-size: 1rem !important;
+        }
+
+        button {
+            position: relative;
+            display: inline-block;
+            font-size: 0.90rem;
+            width: 100%;
+            display: block;
+            margin-top: 2rem;
+
+            text-decoration: none;
+            padding: 0.70rem 1.50rem;
+
+            color: var(--white-color);
+            background-color: #1d2234;
+
+            border: 1px solid var(--purple-color);
+            border-radius: 4px;
+
+            outline: none;
+
+            &:hover {
+                border: 1px solid var(--purple-color);
+                background-color: var(--purple-color);
+            }
+
+            &:focus {
+                outline: none;
+                border: 1px solid var(--purple-color);
+                background-color: var(--purple-color);
+            }
+
+            &:active {
+                outline: none;
+                border: 1px solid var(--purple-color);
+                background-color: var(--purple-color);
+            }
+
+            &-text {
+                font-size: 0.90rem;
+            }
+        }
+    }
+
+    .launchpad-options__item {
+        padding: 1rem 0 0.5rem;
+        border-bottom: 1px solid rgba(40, 40, 75, 0.6);
+        
+
+        &:nth-last-child(1) {
+            border-bottom: 1px solid rgba(40, 40, 75, 0.6);
+        }
+
+    }
+
+    .components-filter__item {
+        
+
+        button {
+            position: relative;
+            display: inline-block;
+            font-size: 0.90rem;
+
+            display: block;
+            width: 100%;
+
+            text-decoration: none;
+            padding: 0.70rem 1.50rem;
+
+            color: var(--white-color);
+
+            background-color: var(--purple-color);
+
+            border: 1px solid var(--purple-color);
+            border-radius: 4px;
+
+            outline: none;
+
+            &:hover {
+                border: 1px solid var(--purple-color);
+            }
+
+            &:focus {
+                outline: none;
+                border: 1px solid var(--purple-color);
+                background-color: var(--purple-color);
+            }
+
+            &:active {
+                outline: none;
+                border: 1px solid var(--purple-color);
+                background-color: var(--purple-color);
+            }
+
+            &-text {
+                font-size: 0.90rem;
+            }
+
+        }
+    }
+
+    &__progressbar {
+        padding-top: 2rem;
+    }
+
+    .progressbar-value {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 1rem;
+    }
+
+    // .progressbar-a {
+
+    // }
+
+    // .progressbar-b {
+
+    // }
+
+    // .progressbars {
+
+    // }
+
+    .progressbar-title {
+        margin-top: 2rem;
+        color: var(--second-text-color);
+    }
+
+    .progressbar-text {
+        margin: 1rem 0;
+
+        img {
+            display: block;
+            width: 100%;
+            margin-top: 1rem;
+            border-radius: 6px;
+        }
+
+    }
+
+    /** launchpad-options */
+    .launchpad-options {
+        margin: 2rem 0;
+        padding-bottom: 2rem;
+
+        &__item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+
+        }
+
+        &__title {
+            color: var(--second-text-color);
+        }
+
+        &__value {
+            color: var(--white-color);
+            text-align: right;
+        }
+
+    }
+
+}
+
+
+
+
+
+@media screen and (max-width: 1000px) {
+
+    .launchpad-inner {
+        max-width: 600px;
+        width: 100%;
+
+    }
+
+}
+
+
+@media screen and (max-width: 767px) {
+
+    .launchpad-inner {
+        max-width: 100%;
+        width: 100%;
+        margin: 0 auto;
+
+    }
+
+}

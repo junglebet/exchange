@@ -1,0 +1,295 @@
+
+/** module orderbook sell start */
+.module-orderbook__sell .module-orderbook {
+    margin-bottom: var(--mp-3);
+
+    .mobile-head-title {
+        display: none;
+    }
+
+    &__title-point {
+        position: absolute;
+        width: 4px;
+        height: 4px;
+        border-radius: 50%;
+        background: var(--red-color);
+        left: 0px;
+        top: 10px;
+    }
+
+    /** title start */
+    &__title {
+        padding-left: 6px;
+        display: flex;
+        justify-content: space-between;
+        font-size: var(--small-font__size);
+        color: var(--first-color);
+        margin: 0;
+        margin-bottom: 0.8rem;
+        color: #8B8D98;
+
+        &-price {
+            width: 25%;
+            text-align: left;
+        }
+
+        &-amount {
+            width: 28%;
+            text-align: right;
+        }
+
+        &-total {
+            width: 32%;
+            text-align: left;
+        }
+
+    }
+    /** title end */
+
+
+    /** list start */
+    &__list {
+        font-size: var(--small-font__size);
+        height: 150px;
+        overflow: hidden;
+
+        &-item {
+            padding: 0.20rem 0;
+            display: flex;
+            justify-content: space-between;
+
+            position: relative;
+
+            &__price {
+                width: 25%;
+                text-align: left;
+                padding-left: 6px;
+            }
+
+            &__amount {
+                width: 28%;
+                text-align: right;
+            }
+
+            &__total {
+                width: 32%;
+                text-align: left;
+            }
+
+            &__progressbar {
+
+                transition: width .5s ease;
+                -webkit-transition: width .5s ease;
+
+                position: absolute;
+                top: 2px;
+                right: 0px;
+
+
+                height: 80%;
+
+                background: rgba(238, 40, 68, 0.16);
+            }
+
+            &:hover {
+                background: var(--rows-color);
+                cursor: pointer;
+            }
+
+        }
+
+    }
+    /** list end */
+
+    /** empty start */
+    &__empty {
+        font-size: 0.90rem;
+        min-height: 150px;
+        color: var(--second-text-color);
+
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        text-align: center;
+    }
+    /** empty end */
+}
+
+/** module orderbook sell end */
+
+
+
+
+
+/** module orderbook buy start */
+.module-orderbook__buy .module-orderbook {
+    margin-bottom: var(--mp-3);
+
+    &__title-point {
+        position: absolute;
+        width: 4px;
+        height: 4px;
+        border-radius: 50%;
+        background: var(--green-color);
+        left: 0px;
+        top: 10px;
+    }
+
+    /** title start */
+    &__title {
+        display: flex;
+        justify-content: space-between;
+        font-size: var(--small-font__size);
+
+        margin: 1rem 0 1rem;
+        padding: var(--mp-1) 0;
+
+        color: var(--second-text-color);
+        margin-left: 6px;
+        border-bottom: 1px solid var(--border-line-color);
+
+        &-price {
+            width: 25%;
+            text-align: left;
+            display: flex;
+            justify-content: flex-start;
+            padding: 0.50rem 0;
+        }
+
+        &-total {
+            width: 32%;
+            text-align: left;
+            display: flex;
+            justify-content: flex-start;
+        }
+
+        &-icon {
+            position: relative;
+            top: 0;
+            left: 8px;
+
+            display: inline-block;
+
+            width: 20px;
+            height: 20px;
+            margin-right: 4px;
+
+            &__color {
+                stroke: var(--green-color);
+                stroke-width: 1;
+                stroke-linecap: round;
+                stroke-linejoin: round;
+            }
+
+        }
+
+    }
+    /** title end */
+
+
+    /** list start */
+    &__list {
+        font-size: var(--small-font__size);
+        height: 150px;
+        overflow: hidden;
+
+        &-item {
+            padding: 0.20rem 0;
+            display: flex;
+            justify-content: space-between;
+
+            position: relative;
+
+            &__price {
+                width: 25%;
+                text-align: left;
+                padding-left: 6px;
+            }
+
+            &__amount {
+                width: 28%;
+                text-align: right;
+            }
+
+            &__total {
+                width: 32%;
+                text-align: left;
+            }
+
+            &__progressbar {
+
+                transition: width .5s ease;
+                -webkit-transition: width .5s ease;
+
+                position: absolute;
+                top: 2px;
+
+                right: 0px;
+
+                height: 80%;
+
+                background: rgba(34, 158, 107, 0.16);
+            }
+
+            &:hover {
+                background: var(--rows-color);
+                cursor: pointer;
+            }
+        }
+
+    }
+    /** list end */
+
+    /** empty start */
+    &__empty-buy {
+        font-size: 0.90rem;
+        min-height: 150px;
+        color: var(--second-text-color);
+
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        text-align: center;
+    }
+    /** empty end */
+
+
+}
+
+/** module orderbook buy end */
+
+.__bar-is-vertical {
+    background: var(--second-text-color) !important;
+}
+
+.__rail-is-vertical {
+    background: var(--white-color) !important;
+}
+
+body.dark {
+    .site-layout {
+        .__bar-is-vertical {
+                background: var(--blue-dark-fourth-color) !important;
+        }
+
+        .__rail-is-vertical {
+            background: var(--blue-dark-bar-color) !important;
+        }
+
+        .widget-market-stats .widget-stats {
+            &__title {
+                &__market-name {
+                    span.market-label {
+                        color: var(--yellow-color);
+                    }
+                }
+            }
+        }
+
+        .widget-markets {
+            background: var(--blue-dark-color);
+        }
+    }
+}

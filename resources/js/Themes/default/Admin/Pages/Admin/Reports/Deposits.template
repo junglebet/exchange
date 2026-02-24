@@ -1,0 +1,169 @@
+<app-layout>
+    <admin-reports-tab :referrer="filters.referrer" section="deposits"></admin-reports-tab>
+    <h1 class="mt-10 mb-8 font-bold text-3xl">
+        <Link class="text-indigo-400 hover:text-indigo-600" :href="route('admin.users.edit', filters.referrer)" v-if="filters.referrer">Go Back - </Link> Deposits
+    </h1>
+    <div class="mb-6 flex justify-between items-center">
+        <search-filter v-model="form.search" class="w-full max-w-md mr-4 focus:outline-none" @reset="reset">
+            <label class="block text-gray-700">Type:</label>
+            <select v-model="form.type" class="mt-1 w-full form-select rounded">
+                <option :value="null" />
+                <option value="coin">Coin</option>
+                <option value="fiat">Fiat</option>
+            </select>
+        </search-filter>
+    </div>
+    <div class="bg-white rounded shadow overflow-x-auto">
+        <table class="w-full whitespace-no-wrap">
+            <tr class="text-left font-bold">
+                <th class="px-6 pt-6 pb-4">Status</th>
+                <th class="px-6 pt-6 pb-4">Hot Wallet</th>
+                <th class="px-6 pt-6 pb-4">ID</th>
+                <th class="px-6 pt-6 pb-4">TXN</th>
+                <th class="px-6 pt-6 pb-4">Amount</th>
+                <th class="px-6 pt-6 pb-4">Address</th>
+                <th class="px-6 pt-6 pb-4">Network</th>
+                <th class="px-6 pt-6 pb-4">User</th>
+                <th class="px-6 pt-6 pb-4">Confirms</th>
+            </tr>
+            <tr v-for="(deposit, key) in deposits.data" :key="key" class="hover:bg-gray-100 focus-within:bg-gray-100">
+                <td class="border-t">
+                    <span class="px-6 py-4 flex items-center focus:text-indigo-500">
+                        <badge class="mr-2" :type="deposit.status == 'confirmed' ? 'green' : 'orange'">
+                            {{ deposit.status == 'confirmed' ? 'Confirmed' : 'Pending' }}
+                        </badge>
+                    </span>
+                </td>
+                <td class="border-t">
+                    <span v-if="deposit.network != 17 && deposit.network.id != 1 && deposit.status == 'confirmed'" class="px-6 py-4 flex items-center">
+
+                        <template v-if="deposit.network.id == 17 || deposit.network.id == 1">
+                            <badge class="mr-2" :type="'orange'">
+                                {{ 'Manual' }}
+                            </badge>
+                        </template>
+                        <template v-else>
+                            <badge v-if="deposit.wallet_transfer_status == 'processed'" class="mr-2" :type="'green'">
+                                {{ 'Transferred' }}
+                            </badge>
+                            <template v-if="deposit.wallet_transfer_status == 'queued' || deposit.wallet_transfer_status == 'pending'">
+
+
+                                <template v-if="deposit.wallet_transfer_status == 'queued'">
+
+                                    <template v-if="deposit.wallet_transfer_ago > 10">
+                                        <div class="block">
+                                            <div>
+                                                <badge class="mb-2" :type="'red'">
+                                                    {{ 'Failed' }}
+                                                </badge>
+                                            </div>
+                                            <div>
+                                                <t-button-green @click="transfer(deposit, key)" class="mr-2">Retry</t-button-green>
+                                            </div>
+                                        </div>
+                                    </template>
+                                    <template v-else>
+                                        <badge class="mr-2" :type="'orange'">
+                                            {{ 'Pending' }}
+                                        </badge>
+                                    </template>
+
+                                </template>
+
+                                <template v-if="deposit.wallet_transfer_status == 'pending'">
+
+                                    <template v-if="deposit.wallet_transfer_ago > 6">
+                                        <div class="block">
+                                            <div>
+                                                <badge class="mb-2" :type="'red'">
+                                                    {{ 'Failed' }}
+                                                </badge>
+                                            </div>
+                                            <div>
+                                                <t-button-green @click="transfer(deposit, key)" class="mr-2">Retry</t-button-green>
+                                            </div>
+                                        </div>
+                                    </template>
+                                    <template v-else>
+                                        <badge class="mr-2" :type="'orange'">
+                                            {{ 'Pending' }}
+                                        </badge>
+                                    </template>
+
+                                </template>
+                            </template>
+                            <template v-if="deposit.wallet_transfer_status == 'failed'">
+                                <div class="block">
+                                    <div>
+                                        <badge  class="mb-2" :type="'red'">
+                                            {{ 'Failed' }}
+                                        </badge>
+                                    </div>
+                                    <div>
+                                        <t-button-green @click="transfer(deposit, key)" class="mr-2">Retry</t-button-green>
+                                    </div>
+                                </div>
+                            </template>
+
+                        </template>
+                    </span>
+
+                </td>
+                <td class="border-t">
+                    <span v-if="deposit.deposit_id" class="px-6 py-4 flex items-center">
+                        {{ format_string(deposit.deposit_id, 5) }}
+                        <font-awesome-icon v-if="deposit.deposit_id" class="text-gray-600 ml-2 cursor-pointer" icon="copy" @click="doCopy(deposit.deposit_id)" />
+                    </span>
+                </td>
+                <td class="border-t">
+                    <span v-if="deposit.txn && deposit.txn_link" class="px-6 py-4 flex items-center">
+                        <a class="text-indigo-500" target="_blank" :href="deposit.txn_link">{{ format_string(deposit.txn, 5) }}</a>
+                        <font-awesome-icon v-if="deposit.txn" class="text-gray-600 ml-2 cursor-pointer" icon="copy" @click="doCopy(deposit.txn)" />
+                    </span>
+                </td>
+                <td class="border-t">
+                    <span class="px-6 py-4 flex items-center">
+                        {{ deposit.amount }} {{ deposit.currency.symbol }}
+                    </span>
+                </td>
+                <td class="border-t">
+                    <div class="px-6 py-4 flex items-center ">
+                        <template v-if="deposit.internal_id">
+                            {{ format_string(deposit.address + ' #' + deposit.internal_id, 15) }}
+                            <font-awesome-icon v-if="deposit.internal_id" class="text-gray-600 ml-2 cursor-pointer" icon="copy" @click="doCopy(deposit.internal_id)" />
+                        </template>
+                        <template v-else>
+                            {{ format_string(deposit.address, 10) }}
+                            <font-awesome-icon v-if="deposit.address" class="text-gray-600 ml-2 cursor-pointer" icon="copy" @click="doCopy(deposit.address)" />
+                        </template>
+                    </div>
+                    <div v-if="deposit.payment_id" class="px-6 py-4 flex items-center">
+                        {{ format_string(deposit.payment_id, 10) }}
+                        <font-awesome-icon v-if="deposit.payment_id" class="text-gray-600 ml-2 cursor-pointer" icon="copy" @click="doCopy(deposit.payment_id)" />
+                    </div>
+                </td>
+                <td class="border-t">
+                    <span class="px-6 py-4 flex items-center">
+                        {{ deposit.network.name }}
+                    </span>
+                </td>
+                <td class="border-t">
+                    <span class="px-6 py-4 flex items-center">
+                        {{ deposit.user.email }}<br> ID: {{ deposit.user.id }}
+                    </span>
+                </td>
+                <td class="border-t">
+                    <span class="px-6 py-4 flex items-center">
+                        {{ deposit.confirms }}
+                    </span>
+                </td>
+
+            </tr>
+            <tr v-if="deposits.data.length === 0">
+                <td class="border-t px-6 py-2" colspan="100">No deposits found.</td>
+            </tr>
+        </table>
+    </div>
+    <pagination :links="deposits.links" />
+</app-layout>
