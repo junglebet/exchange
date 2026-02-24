@@ -426,7 +426,7 @@
             <!-- copyright start -->
             <div class="copyright">
                 <div class="copyright-left">
-                    <p>{{ $page.props.siteName }} {{ $t('© 2024') }} {{ $t('Copyrighted by CCTech')}}</p>
+                    <p>{{ $page.props.siteName }} {{ $t('© 2024') }}</p>
                 </div>
                 <div class="copyright-right">
                     <span>
