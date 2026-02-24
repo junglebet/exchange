@@ -8,12 +8,8 @@
         <div class="head-row">
 
             <div class="head-title">
-                <h1>{{ $t('The Most') }}
-                    <span class="typer typer-text" id="typer-main" :data-words="$t('Trusted') +','+ $t('Secure') +','+ $t('Fast') +','+ $t('Reliable')" data-delay="100" data-deleteDelay="1000"></span>
-                    <span class="cursor typer-cursor" data-owner="typer-main"></span>
-                    <br>{{ $t('Cryptocurrency Exchange.') }}
-                </h1>
-                <p>{{ $t('Get started with the easiest and most secure platform to buy, sell, trade, and earn cryptocurrencies.') }}</p>
+                <h1>{{ $t('The Gamble-Fi Exchange') }}</h1>
+                <p>{{ $t('Get started with just an email address to buy, sell, trade, and earn gamble-fi crypto tokens.') }}</p>
                 <Link :href="route('markets')">{{ $t('Get Access') }}</Link>
             </div>
 

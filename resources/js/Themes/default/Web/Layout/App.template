@@ -191,9 +191,9 @@
 
             <!-- banner start -->
             <div v-if="isHomePage" class="banner">
-                <h2>{{ $t('Take your crypto to the next level with our platform') }}</h2>
+                <h2>{{ $t('Take your portfolio to the moon with gamble-fi investments') }}</h2>
                 <div class="banner-text">
-                    <p>{{ $t('Our platform is the easiest place to buy and sell cryptocurrency. Sign up and get started today.') }}</p>
+                    <p>{{ $t('Buy - Sell - Trade Gamble-fi and other cryptocurrencies. Sign up and get started today.') }}</p>
 
                     <Link v-if="$page.props.user" :href="route('markets')">{{ $t('Get Access') }}</Link>
                     <Link v-if="!$page.props.user" :href="route('register')">{{ $t('Get Access') }}</Link>
