@@ -426,7 +426,7 @@
             <!-- copyright start -->
             <div class="copyright">
                 <div class="copyright-left">
-                    <p>{{ $page.props.siteName }} {{ $t('© 2024') }}</p>
+                    <p>© 2026 Junglebet.com | All Rights Reserved | <a href="mailto:info@junglebet.com" class="copyright-link">info@junglebet.com</a></p>
                 </div>
                 <div class="copyright-right">
                     <span>

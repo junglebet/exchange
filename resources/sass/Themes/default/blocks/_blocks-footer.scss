@@ -166,6 +166,14 @@
             p {
                 opacity: 50%;
             }
+            a.copyright-link {
+                color: inherit;
+                opacity: 1;
+                text-decoration: none;
+                &:hover {
+                    text-decoration: underline;
+                }
+            }
         }
 
         &-right {
